@@ -1,4 +1,4 @@
-GREFFE,ADRESSE,CODE_POSTAL,VILLE,TELEPHONE,FAX,SITE_LOCAL,COMPLEMENT_ADRESSE,LATTITUDE,LONGITUDE,HORAIRES,NUMERO,GREFFE_NORMALISE,SITE_DATA_GREFFE
+GREFFE,ADRESSE,CODE_POSTAL,VILLE,TELEPHONE,FAX,SITE_LOCAL,COMPLEMENT_ADRESSE,LATITUDE,LONGITUDE,HORAIRES,NUMERO,GREFFE_NORMALISE,SITE_DATA_GREFFE
 LA ROCHELLE,14 RUE DU PALAIS,17001,LA ROCHELLE CEDEX 1,546413465,,http://www.greffe-tc-larochelle.fr,Hotel de La Bourse,46.159636,-1.153709,Ouverture au Public : Du lundi au vendredi de 8h30 à 12h00 et de 13h30 à 16h00 Standard téléphonique</u> :<br>Du lundi au vendredi de 10h00 à 12h00 et de 14h00 à 16h00,1704,larochelle,https://larochelle-mongreffe.opendatasoft.com
 MARSEILLE,2 RUE EMILE POLLAK,13291,MARSEILLE CEDEX 06,491547040,,http://www.greffe-tc-marseille.fr,,43.291342,5.374374,- du lundi au Jeudi de 08 h 20 à 12 h 00 et de 13 h 00 à 16 h 00. Le vendredi de 08 h 20 à 12 h 00 et de 13 h 00 à 15 h 30,1303,marseille,https://marseille-mongreffe.opendatasoft.com
 MANOSQUE,RUE DES TANNEURS,4100,MANOSQUE,492877426,492726663,http://www.greffe-tc-manosque.fr,,43.830893,5.785401,9h-12h/14h-17h,401,manosque,https://manosque-mongreffe.opendatasoft.com
