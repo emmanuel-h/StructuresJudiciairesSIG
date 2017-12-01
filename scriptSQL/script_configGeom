@@ -1,0 +1,8 @@
+ALTER TABLE public.annuaire_lieux_justice ADD COLUMN geom geometry;
+ALTER TABLE public.annuaire_tgi ADD COLUMN geom  geometry;
+ALTER TABLE public.annuaire_ti ADD COLUMN geom geometry;
+ALTER TABLE public."liste-des-greffes" ADD COLUMN geom geometry;
+update public.annuaire_lieux_justice set geom=ST_SetSRID(ST_MakePoint(cast(longitude as numeric),cast(latitude as numeric)),2154) ::geometry;
+update public.annuaire_tgi set geom=ST_SetSRID(ST_MakePoint(cast(longitude as numeric),cast(latitude as numeric)),2154) ::geometry;
+update public.annuaire_ti set geom=ST_SetSRID(ST_MakePoint(cast(longitude as numeric),cast(latitude as numeric)),2154) ::geometry;
+update public."liste-des-greffes" set geom=ST_SetSRID(ST_MakePoint(cast(longitude as numeric),cast(latitude as numeric)),2154) ::geometry;
