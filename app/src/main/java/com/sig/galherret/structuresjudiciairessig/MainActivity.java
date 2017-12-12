@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
         webView.setWebChromeClient(new WebChromeClient());
         //webView.loadUrl("http://openlayers.org/en/latest/build/ol.js");
         //webView.loadUrl("http://192.168.1.38:8080/openlayers/v4/ol.js");
-        webView.loadUrl("http://192.168.1.38:8080/structuresJudiciaires/mobileTest.html");
+        webView.loadUrl("file:///android_asset/canvasexample.html");
 
         //webView.loadUrl("http://openlayers.org/en/latest/examples/mobile-full-screen.html?q=mobile");
 
