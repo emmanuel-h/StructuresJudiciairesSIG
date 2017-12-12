@@ -1,3 +1,8 @@
 <resources>
+    <string name="project_name">Structures Judiciaires</string>
     <string name="app_name">StructuresJudiciairesSIG</string>
+    <string name="serverAddress">192.168.1.38</string>
+    <string name="serverPort">8080</string>
+    <string name="olLocalisation">/openlayers/v4/ol.js</string>
+    <string name="style">/structuresJudiciaires/style/style.css</string>
 </resources>
