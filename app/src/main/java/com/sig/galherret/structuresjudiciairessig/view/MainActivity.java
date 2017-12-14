@@ -45,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(this,permissions,42);
 
         manageToolbar();
+
+        loadFile();
     }
 
     private void loadFile(){
@@ -95,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
         if (grantResults[0] == PERMISSION_GRANTED){
             Intent intent = new Intent(this, GPSService.class);
             startService(intent);
+            getPrefs();
             loadFile();
         }
     }
