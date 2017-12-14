@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -91,14 +92,18 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (grantResults[0] == PERMISSION_DENIED ){
-            Toast.makeText(getBaseContext(), "You have to allow the app to acces the location. Please do this and restart the app", Toast.LENGTH_LONG).show();
-            finish();
+            Toast.makeText(getBaseContext(), "You have to allow the app to access the location. Please do this and restart the app", Toast.LENGTH_LONG).show();
         }
         if (grantResults[0] == PERMISSION_GRANTED){
             Intent intent = new Intent(this, GPSService.class);
             startService(intent);
-            getPrefs();
-            loadFile();
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    getPrefs();
+                    loadFile();
+                }
+            }, 1000);
         }
     }
 }
