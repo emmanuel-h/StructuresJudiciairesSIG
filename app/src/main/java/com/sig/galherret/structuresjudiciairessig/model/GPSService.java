@@ -37,22 +37,24 @@ public class GPSService extends Service implements LocationListener {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PERMISSION_GRANTED) {
             Toast.makeText(getBaseContext(), "No location permission", Toast.LENGTH_LONG).show();
             locationAvailable = false;
+
         } else {
             if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
                 locationAvailable = false;
             } else {
                 locationAvailable = true;
             }
+
+            // We store the location of the user at the start of the service..
+            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (null != location) {
+                saveCoordinates(location);
+            }
+            //.. and if he move we actualize it every second
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                    1000,   // 3 sec
+                    0.05f, this);
         }
-        // We store the location of the user at the start of the service..
-        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if (null != location) {
-            saveCoordinates(location);
-        }
-        //.. and if he move we actualize it every second
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                1000,   // 3 sec
-                0.05f, this);
     }
 
     @Nullable

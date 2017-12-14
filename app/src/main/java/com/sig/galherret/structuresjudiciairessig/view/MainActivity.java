@@ -1,14 +1,20 @@
 package com.sig.galherret.structuresjudiciairessig.view;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.sig.galherret.structuresjudiciairessig.R;
 import com.sig.galherret.structuresjudiciairessig.model.GPSService;
@@ -19,17 +25,24 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Properties;
 
+import static android.content.pm.PackageManager.PERMISSION_DENIED;
+import static android.content.pm.PackageManager.PERMISSION_GRANTED;
+
 public class MainActivity extends AppCompatActivity {
 
     private float longitude;
     private float latitude;
-    private final float DEFAULT_LONGITUDE = 48.859489f;
-    private final float DEFAULT_LATITUDE = 2.320582f;
+    private final float DEFAULT_LATITUDE = 48.859489f;
+    private final float DEFAULT_LONGITUDE = 2.320582f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // We ask the user to access the location
+        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
+        ActivityCompat.requestPermissions(this,permissions,42);
 
         manageToolbar();
 
@@ -72,5 +85,14 @@ public class MainActivity extends AppCompatActivity {
         // If there is no known position, we center the map on Paris
         latitude = userPrefs.getFloat("lastKnownLatitude",DEFAULT_LATITUDE);
         longitude = userPrefs.getFloat("lastKnownLongitude",DEFAULT_LONGITUDE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (grantResults[0] == PERMISSION_DENIED ){
+            Toast.makeText(getBaseContext(), "You have to allow the app to acces the location. Please do this and restart the app", Toast.LENGTH_LONG).show();
+            finish();
+        }
     }
 }
