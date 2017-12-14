@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if [ $# -eq 0 ]
+then
+  echo "$0 : Pas d'arguments passés"
+  exit 1
+fi
+if [ $# -eq 2 ]
+then
+  ogr2ogr -f GeoJSON -t_srs crs:84 $1 $2
+  exit 0
+fi
+
+if [ $1 == "-help" ]
+then
+  echo "./json2shp [DESTINATION.json] [FILE_TO_EXPORT.shp]"
+fi
