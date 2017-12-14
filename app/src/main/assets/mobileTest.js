@@ -11,7 +11,7 @@ function afficherMap(longitude, latitude){
             view: new ol.View({
               center: ol.proj.transform(
                 [+longitude,+latitude], 'EPSG:4326','EPSG:3857'),
-              zoom: 11
+              zoom: 20
             })
           });
 }

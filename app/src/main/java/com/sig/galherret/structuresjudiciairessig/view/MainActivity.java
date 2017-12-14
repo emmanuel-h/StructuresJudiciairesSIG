@@ -1,70 +1,103 @@
 package com.sig.galherret.structuresjudiciairessig.view;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.sig.galherret.structuresjudiciairessig.R;
+import com.sig.galherret.structuresjudiciairessig.model.GPSService;
 
 import org.apache.commons.io.IOUtils;
-
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.util.Map;
 import java.util.Properties;
-import java.util.StringTokenizer;
-import java.util.TreeMap;
-import java.util.logging.Logger;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Map userPrefs;
-    private float longitude; // 1.9f
-    private float latitude; // 47.91f
-    private String prenom;
+    private float longitude;
+    private float latitude;
+    private final float DEFAULT_LONGITUDE=48.859489f;
+    private final float DEFAULT_LATITUDE=2.320582f;
+/*
+    private GPSService mBoundService;
+    private boolean gpsServiceBound;
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            mBoundService = ((GPSService.LocalBinder)service).getService();
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            mBoundService = null;
+        }
+    };
+
+    void doBindService() {
+        bindService(new Intent(MainActivity.this,
+                GPSService.class), mConnection, Context.BIND_AUTO_CREATE);
+        gpsServiceBound = true;
+    }
+
+    void doUnbindService() {
+        if (gpsServiceBound) {
+            // Detach our existing connection.
+            unbindService(mConnection);
+            gpsServiceBound = false;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        doUnbindService();
+    }*/
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        getPrefs();
-
         manageToolbar();
 
-        WebView webView = (WebView) findViewById(R.id.webView);
+        Intent intent = new Intent(this, GPSService.class);
+        startService(intent);
+
+        Handler handler = new Handler();
+        int delay = 1000;
+
+        handler.postDelayed(new Runnable(){
+            public void run(){
+                loadFile();
+                handler.postDelayed(this, delay);
+            }
+        }, delay);
+    }
+
+    private void loadFile(){
+        getPrefs();
+        WebView webView = findViewById(R.id.webView);
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.setWebChromeClient(new WebChromeClient());
-        
+        webView.setWebViewClient(new WebViewClient());
         String content;
         try{
-            content = IOUtils.toString(getAssets().open("mobileTest.html"));
-            String temp = content.replaceAll("%LATITUDE%", String.valueOf(latitude));
-            String temp2 = temp.replaceAll("%LONGITUDE%", String.valueOf(longitude));
-            webView.loadDataWithBaseURL("file:///android_asset/mobileTest.html", temp2, "text/html", "UTF-8", null);
-            //content = IOUtils.toString(getAssets().open("test.html")).replaceAll("%QUI%",getProperty("prenom",getApplicationContext()));
-            //webView.loadDataWithBaseURL("file:///android_asset/test.html",content,"text/html","UTF-8",null);
+            content = IOUtils.toString(getAssets().open("mobileTest.html"),Charset.forName("UTF-8"))
+                    .replaceAll("%LATITUDE%", String.valueOf(latitude))
+                    .replaceAll("%LONGITUDE%", String.valueOf(longitude));
+            webView.loadDataWithBaseURL("file:///android_asset/mobileTest.html", content, "text/html", "UTF-8", null);
         } catch (IOException e){
             e.printStackTrace();
         }
-    }
-
-    @Override
-    protected void onPause() {
-        SharedPreferences.Editor editor = getSharedPreferences("userPrefs", 0).edit();
-        editor.putFloat("lastKnownLatitude", latitude);
-        editor.putFloat("lastKnownLongitude", longitude);
-        editor.apply();
     }
 
     private void manageToolbar(){
@@ -74,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private String getProperty(String key,Context context) throws IOException {
+    private String getServerProperties(String key,Context context) throws IOException {
         Properties properties = new Properties();
         AssetManager assetManager = context.getAssets();
         InputStream inputStream = assetManager.open("server.properties");
@@ -82,17 +115,10 @@ public class MainActivity extends AppCompatActivity {
         return properties.getProperty(key);
     }
 
-    public void getPrefs(){
-        userPrefs = (Map) getSharedPreferences("userPrefs", MODE_PRIVATE);
-        if(userPrefs.containsKey("lastKnownLatitude")) {
-            latitude = (float) userPrefs.get("lastKnownLatitude");
-        }else{
-            latitude = 48.87f; // latitude de Paris
-        }
-        if(userPrefs.containsKey("lastKnownLongitude")) {
-            longitude = (float) userPrefs.get("lastKnownLongitude");
-        }else{
-            longitude = 2.33f; // longitude de Paris
-        }
+    private void getPrefs(){
+        SharedPreferences userPrefs = getSharedPreferences("coordinates", MODE_PRIVATE);
+        // If there is no known position, we center the map on Paris
+        latitude = userPrefs.getFloat("lastKnownLatitude",DEFAULT_LATITUDE);
+        longitude = userPrefs.getFloat("lastKnownLongitude",DEFAULT_LONGITUDE);
     }
 }
