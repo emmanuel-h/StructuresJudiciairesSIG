@@ -45,10 +45,6 @@ public class MainActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(this,permissions,42);
 
         manageToolbar();
-
-        Intent intent = new Intent(this, GPSService.class);
-        startService(intent);
-        loadFile();
     }
 
     private void loadFile(){
@@ -95,6 +91,11 @@ public class MainActivity extends AppCompatActivity {
         if (grantResults[0] == PERMISSION_DENIED ){
             Toast.makeText(getBaseContext(), "You have to allow the app to acces the location. Please do this and restart the app", Toast.LENGTH_LONG).show();
             finish();
+        }
+        if (grantResults[0] == PERMISSION_GRANTED){
+            Intent intent = new Intent(this, GPSService.class);
+            startService(intent);
+            loadFile();
         }
     }
 }
