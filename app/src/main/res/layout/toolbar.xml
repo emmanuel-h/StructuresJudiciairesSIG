@@ -11,7 +11,7 @@
         android:id="@+id/buttonShowMore"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:background="@drawable/hamburger_icon"
+        android:background="@drawable/refresh_icon"
         android:backgroundTint="@android:color/background_light"
         android:visibility="visible" />
 

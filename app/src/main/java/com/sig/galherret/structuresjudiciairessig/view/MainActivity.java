@@ -5,9 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
@@ -26,42 +24,8 @@ public class MainActivity extends AppCompatActivity {
 
     private float longitude;
     private float latitude;
-    private final float DEFAULT_LONGITUDE=48.859489f;
-    private final float DEFAULT_LATITUDE=2.320582f;
-/*
-    private GPSService mBoundService;
-    private boolean gpsServiceBound;
-
-    private ServiceConnection mConnection = new ServiceConnection() {
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            mBoundService = ((GPSService.LocalBinder)service).getService();
-        }
-
-        public void onServiceDisconnected(ComponentName className) {
-            mBoundService = null;
-        }
-    };
-
-    void doBindService() {
-        bindService(new Intent(MainActivity.this,
-                GPSService.class), mConnection, Context.BIND_AUTO_CREATE);
-        gpsServiceBound = true;
-    }
-
-    void doUnbindService() {
-        if (gpsServiceBound) {
-            // Detach our existing connection.
-            unbindService(mConnection);
-            gpsServiceBound = false;
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        doUnbindService();
-    }*/
-
+    private final float DEFAULT_LONGITUDE = 48.859489f;
+    private final float DEFAULT_LATITUDE = 2.320582f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,16 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = new Intent(this, GPSService.class);
         startService(intent);
-
-        Handler handler = new Handler();
-        int delay = 1000;
-
-        handler.postDelayed(new Runnable(){
-            public void run(){
-                loadFile();
-                handler.postDelayed(this, delay);
-            }
-        }, delay);
+        loadFile();
     }
 
     private void loadFile(){
@@ -102,9 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void manageToolbar(){
         Button button = findViewById(R.id.buttonShowMore);
-        button.setOnClickListener(l -> {
-            Toast.makeText(this, "afficher des trucs", Toast.LENGTH_LONG).show();
-        });
+        button.setOnClickListener(l -> loadFile());
     }
 
     private String getServerProperties(String key,Context context) throws IOException {

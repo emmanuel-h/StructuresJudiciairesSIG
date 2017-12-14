@@ -23,6 +23,8 @@ public class GPSService extends Service implements LocationListener {
     private LocationManager locationManager;
     private final IBinder mBinder = new LocalBinder();
 
+    private boolean locationAvailable;
+
     public class LocalBinder extends Binder {
         public GPSService getService() {
             return GPSService.this;
@@ -31,18 +33,22 @@ public class GPSService extends Service implements LocationListener {
 
     @Override
     public void onCreate() {
-
-        /********** get Gps location service LocationManager object ***********/
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PERMISSION_GRANTED) {
-
-            Toast.makeText(getBaseContext(), "No permission 1 ", Toast.LENGTH_LONG).show();
-            return;
+            Toast.makeText(getBaseContext(), "No location permission", Toast.LENGTH_LONG).show();
+            locationAvailable = false;
+        } else {
+            if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+                locationAvailable = false;
+            } else {
+                locationAvailable = true;
+            }
         }
         // We store the location of the user at the start of the service..
         Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        saveCoordinates(location);
+        if (null != location) {
+            saveCoordinates(location);
+        }
         //.. and if he move we actualize it every second
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                 1000,   // 3 sec
@@ -57,17 +63,21 @@ public class GPSService extends Service implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        saveCoordinates(location);
+        if(locationAvailable && null != location) {
+            saveCoordinates(location);
+        }
     }
 
     @Override
     public void onProviderDisabled(String provider) {
-        Toast.makeText(getBaseContext(), "Gps turned off ", Toast.LENGTH_LONG).show();
+        Toast.makeText(getBaseContext(), "Gps turned off", Toast.LENGTH_LONG).show();
+        locationAvailable = false;
     }
 
     @Override
     public void onProviderEnabled(String provider) {
-        Toast.makeText(getBaseContext(), "Gps turned on ", Toast.LENGTH_LONG).show();
+        Toast.makeText(getBaseContext(), "Gps turned on", Toast.LENGTH_LONG).show();
+        locationAvailable = true;
     }
 
     @Override
