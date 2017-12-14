@@ -9,18 +9,21 @@ import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.sig.galherret.structuresjudiciairessig.builder.HtmlBuilder;
-
 import org.apache.commons.io.IOUtils;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Properties;
+import java.util.StringTokenizer;
+import java.util.logging.Logger;
 
 public class MainActivity extends AppCompatActivity {
 
-    private float posX; // 1.9f
-    private float posY; // 47.91f
+    private float latitude; // 1.9f
+    private float longitude; // 47.91f
     private String prenom;
 
     @Override
@@ -30,19 +33,20 @@ public class MainActivity extends AppCompatActivity {
 
         manageToolbar();
 
+        readPrefs();
+
         WebView webView = (WebView) findViewById(R.id.webView);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebChromeClient(new WebChromeClient());
-
-        //HtmlBuilder builder = new HtmlBuilder(this, 1.9f, 47.91f);
-        //Logger.getAnonymousLogger().severe("html : " + builder.buildHtml());
-        //webView.loadData(builder.buildHtml(), "text/html", "UTF-8");
-        //webView.loadUrl("javascript:showAnnuaireLieuxJustice()");
-        //webView.loadUrl("file:///android_asset/test.html");
+        
         String content;
         try{
-            content = IOUtils.toString(getAssets().open("test.html")).replaceAll("%QUI%",getProperty("prenom",getApplicationContext()));
-            webView.loadDataWithBaseURL("file:///android_asset/test.html",content,"text/html","UTF-8",null);
+            content = IOUtils.toString(getAssets().open("mobileTest.html"));
+            String temp = content.replaceAll("%LATITUDE%", String.valueOf(latitude));
+            String temp2 = temp.replaceAll("%LONGITUDE%", String.valueOf(longitude));
+            webView.loadDataWithBaseURL("file:///android_asset/mobileTest.html", temp2, "text/html", "UTF-8", null);
+            //content = IOUtils.toString(getAssets().open("test.html")).replaceAll("%QUI%",getProperty("prenom",getApplicationContext()));
+            //webView.loadDataWithBaseURL("file:///android_asset/test.html",content,"text/html","UTF-8",null);
         } catch (IOException e){
             e.printStackTrace();
         }
@@ -63,5 +67,42 @@ public class MainActivity extends AppCompatActivity {
         properties.load(inputStream);
         return properties.getProperty(key);
 
+    }
+
+    public void readPrefs(){
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(getAssets().open("Data/user.prefs")));
+            String line = br.readLine();
+            while(null != line){
+                if(line.contains("Latitude")){
+                    String value = readPrefValue(line);
+                    if(value.equals("/")){
+
+                    }else{
+                        latitude = Float.parseFloat(value);
+                    }
+                }
+                if(line.contains("Longitude")){
+                    String value = readPrefValue(line);
+                    if(value.equals("/")){
+
+                    }else{
+                        longitude = Float.parseFloat(value);
+                    }
+                }
+                line = br.readLine();
+            }
+            br.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("ERROR : failed to find user.prefs file");
+        } catch (IOException e) {
+            System.out.println("ERROR : failed to read user.prefs file");
+        }
+    }
+
+    public String readPrefValue(String line){
+        StringTokenizer st = new StringTokenizer(line, "=");
+        st.nextToken();
+        return st.nextToken();
     }
 }

@@ -15,16 +15,21 @@
       }
     </style>
 
-    <script src ='http://192.168.1.38:8080/openlayers/v4/ol.js' type="text/javascript"></script>
+    <script src ='Openlayers/ol.js' type="text/javascript"></script>
+    <script src='mobileTest.js' type='text/javascript'></script>
 
   </head>
   <body>
-    <button id="neighborhoodsButton">Show / Hide Neighborhoods</button>
 
     <div id="map" class="map">
 
     </div>
 
+    <script>
+        afficherMap('%LATITUDE%','%LONGITUDE%');
+    </script>
+
+    <!--
     <script>
       var map = new ol.Map({
         layers: [
@@ -69,5 +74,6 @@
       	}
       }, false);
     </script>
+    -->
   </body>
 </html>
