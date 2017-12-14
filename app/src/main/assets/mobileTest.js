@@ -1,6 +1,6 @@
 var map;
 
-function afficherMap(latitude, longitude){
+function afficherMap(longitude, latitude){
     map = new ol.Map({
             layers: [
               new ol.layer.Tile({
@@ -10,7 +10,7 @@ function afficherMap(latitude, longitude){
             target: 'map',
             view: new ol.View({
               center: ol.proj.transform(
-                [+latitude,+longitude], 'EPSG:4326','EPSG:3857'),
+                [+longitude,+latitude], 'EPSG:4326','EPSG:3857'),
               zoom: 11
             })
           });

@@ -1,6 +1,7 @@
 package com.sig.galherret.structuresjudiciairessig.view;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -19,14 +20,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 
 public class MainActivity extends AppCompatActivity {
 
-    private float latitude; // 1.9f
-    private float longitude; // 47.91f
+    private Map userPrefs;
+    private float longitude; // 1.9f
+    private float latitude; // 47.91f
     private String prenom;
 
     @Override
@@ -34,9 +38,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        manageToolbar();
+        getPrefs();
 
-        readPrefs();
+        manageToolbar();
 
         WebView webView = (WebView) findViewById(R.id.webView);
         webView.getSettings().setJavaScriptEnabled(true);
@@ -53,7 +57,14 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e){
             e.printStackTrace();
         }
+    }
 
+    @Override
+    protected void onPause() {
+        SharedPreferences.Editor editor = getSharedPreferences("userPrefs", 0).edit();
+        editor.putFloat("lastKnownLatitude", latitude);
+        editor.putFloat("lastKnownLongitude", longitude);
+        editor.apply();
     }
 
     private void manageToolbar(){
@@ -69,43 +80,19 @@ public class MainActivity extends AppCompatActivity {
         InputStream inputStream = assetManager.open("server.properties");
         properties.load(inputStream);
         return properties.getProperty(key);
-
     }
 
-    public void readPrefs(){
-        try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(getAssets().open("Data/user.prefs")));
-            String line = br.readLine();
-            while(null != line){
-                if(line.contains("Latitude")){
-                    String value = readPrefValue(line);
-                    if(value.equals("/")){
-
-                    }else{
-                        latitude = Float.parseFloat(value);
-                    }
-                }
-                if(line.contains("Longitude")){
-                    String value = readPrefValue(line);
-                    if(value.equals("/")){
-
-                    }else{
-                        longitude = Float.parseFloat(value);
-                    }
-                }
-                line = br.readLine();
-            }
-            br.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("ERROR : failed to find user.prefs file");
-        } catch (IOException e) {
-            System.out.println("ERROR : failed to read user.prefs file");
+    public void getPrefs(){
+        userPrefs = (Map) getSharedPreferences("userPrefs", MODE_PRIVATE);
+        if(userPrefs.containsKey("lastKnownLatitude")) {
+            latitude = (float) userPrefs.get("lastKnownLatitude");
+        }else{
+            latitude = 48.87f; // latitude de Paris
         }
-    }
-
-    public String readPrefValue(String line){
-        StringTokenizer st = new StringTokenizer(line, "=");
-        st.nextToken();
-        return st.nextToken();
+        if(userPrefs.containsKey("lastKnownLongitude")) {
+            longitude = (float) userPrefs.get("lastKnownLongitude");
+        }else{
+            longitude = 2.33f; // longitude de Paris
+        }
     }
 }
