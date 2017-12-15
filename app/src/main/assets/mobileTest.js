@@ -2,30 +2,55 @@ var map;
 
 function afficherMap(longitude, latitude){
 
-var vectorLayerTi = createLayer('annuaire_ti.json','#ff0000',3,10,2500);
-var vectorLayerTgi = createLayer('annuaire_tgi.json','#00ff00',4,10,5000);
-var vectorLayerListeGreffes = createLayer('liste-des-greffes.json','#0000ff',2,10,3000);
-var vectorLayerLieuxJustice = createLayer('annuaire_lieux_justice.json','#ffff00',1,10,500);
+//creation des layers
+var vectorLayerTi = createLayer('annuaire_ti.json','#ff0000',3,0.1,2500);
+var vectorLayerTgi = createLayer('annuaire_tgi.json','#00ff00',4,0.1,5000);
+var vectorLayerListeGreffes = createLayer('liste-des-greffes.json','#0000ff',2,0.1,3000);
+var vectorLayerLieuxJustice = createLayer('annuaire_lieux_justice.json','#ffff00',1,0.1,500);
 
-
+//création de la map avec OSM et les differents layers
     var map = new ol.Map({
-            layers: [
-              new ol.layer.Tile({
+        layers: [
+            new ol.layer.Tile({
                 source: new ol.source.OSM()
-              }),
-              vectorLayerTi, vectorLayerLieuxJustice, vectorLayerListeGreffes, vectorLayerTgi
-            ],
-            target: 'map',
-            view: new ol.View({
-              center: ol.proj.transform(
+            }),
+            vectorLayerTi, vectorLayerLieuxJustice, vectorLayerListeGreffes, vectorLayerTgi
+        ],
+        target: 'map',
+        view: new ol.View({
+            center: ol.proj.transform(
                 [+longitude,+latitude], 'EPSG:4326','EPSG:3857'),
-              zoom: 11
+                zoom: 11
             })
-          });
-}
+    });
 
+//catch de l'event de mouvement de la map et application de la fonction de changement de style des layers
+ map.on('moveend',changeStyle);
 
-function createLayer(file,colorPoint,zIndex,minR,maxR){
+//fonction pour changer le style des layers en fonction du niveau de zoom
+ function changeStyle(){
+    var newZoom = map.getView().getZoom();
+    newZoom > 10 ? vectorLayerTgi.setStyle(styleFunction("#00ff00",12)) : vectorLayerTgi.setStyle(styleFunction('#00ff00',5)) ;
+    newZoom > 12 ? vectorLayerTi.setStyle(styleFunction("#ff0000",8)) : vectorLayerTi.setStyle(styleFunction('#ff0000',5)) ;
+    newZoom > 10 ? vectorLayerListeGreffes.setStyle(styleFunction("#0000ff",12)) : vectorLayerListeGreffes.setStyle(styleFunction('#0000ff',5)) ;
+    newZoom > 12 ? vectorLayerLieuxJustice.setStyle(styleFunction("#ffff00",8)) : vectorLayerLieuxJustice.setStyle(styleFunction('#ffff00',5)) ;
+};
+
+ //fonction pour recuperer un style de point avec une couleur et un rayon
+     function styleFunction(colorP,rad){
+       var style = new ol.style.Style({
+                  image: new ol.style.Circle(({
+                       radius: rad,
+                       fill: new ol.style.Fill({
+                                 color: colorP
+                            })
+                       }))
+         });
+        return style;
+     }
+
+//fonction pour creer les layers en fonction du fichier, de la couleur des points, du positionnement en Z et l'intervalle d'affichage(min/max)
+function createLayer(file,colorPoint,index,minR,maxR){
     var vectorLayer = new ol.layer.Vector({
             source: new ol.source.Vector({
                 format: new ol.format.GeoJSON({
@@ -43,8 +68,12 @@ function createLayer(file,colorPoint,zIndex,minR,maxR){
                 }))
              }),
             minResolution: minR,
-            maxResolution: maxR
+            maxResolution: maxR,
+            zIndex: index
         })
-        vectorLayer.setZIndex(zIndex);
-        return vectorLayer
+        return vectorLayer;
 }
+
+}
+
+
