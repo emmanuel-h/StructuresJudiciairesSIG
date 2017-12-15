@@ -26,10 +26,7 @@ public class GPSService extends Service implements LocationListener {
 
     private boolean locationAvailable;
 
-    public class LocalBinder extends Binder {
-        public GPSService getService() {
-            return GPSService.this;
-        }
+    private class LocalBinder extends Binder {
     }
 
     @Override
@@ -100,6 +97,6 @@ public class GPSService extends Service implements LocationListener {
         SharedPreferences.Editor editor = coordinates.edit();
         editor.putFloat("lastKnownLatitude",(float) location.getLatitude());
         editor.putFloat("lastKnownLongitude",(float) location.getLongitude());
-        editor.commit();
+        editor.apply();
     }
 }

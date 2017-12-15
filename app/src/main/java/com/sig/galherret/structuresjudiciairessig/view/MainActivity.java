@@ -58,26 +58,100 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        manageToolbar();
         // We ask the user to access the location
         String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
-        ActivityCompat.requestPermissions(this,permissions,42);
-
-        manageToolbar();
-        updateJson();
-        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
-                new IntentFilter("download"));
+        ActivityCompat.requestPermissions(this, permissions, 42);
+        // Launch the localisation service
         launchLocalisationService();
+        // Launch the web file
         loadFile();
+        // If there is already a SavedInstanceState, we reload only the desired values
+        if(null != savedInstanceState){
+            latitude = savedInstanceState.getFloat("latitude");
+            longitude = savedInstanceState.getFloat("longitude");
+        } else {
+            // If application just been launched, we check for updates with the server
+            updateJson();
+            LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+                    new IntentFilter("download"));
+        }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (grantResults[0] == PERMISSION_DENIED ){
+            Toast.makeText(getBaseContext(), "You doesn't allow the app to access the location, some services may not work properly", Toast.LENGTH_LONG).show();
+        }
+        if (grantResults[0] == PERMISSION_GRANTED){
+            launchLocalisationService();
+            // We now have the permission, we wait one second and reload the page with the new localisation
+            Handler handler = new Handler();
+            handler.postDelayed(() -> {
+                getPrefs();
+                loadFile();
+            }, 1000);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putFloat("latitude",latitude);
+        outState.putFloat("longitude",longitude);
+    }
+
+    private void launchLocalisationService(){
+        Intent intent = new Intent(this, GPSService.class);
+        startService(intent);
+    }
+
+    private void updateJson(){
+        // Instantiate the ProgressBar
+        ProgressDialog mProgressDialog;
+        mProgressDialog = new ProgressDialog(MainActivity.this);
+        mProgressDialog.setMessage("Update informations from the server");
+        mProgressDialog.setIndeterminate(true);
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        mProgressDialog.setCancelable(true);
+
+        // Launch the download async task
+        final DownloadFile downloadFile = new DownloadFile(MainActivity.this, mProgressDialog);
+        try {
+            downloadFile.execute("http://"+getServerProperties("IPAddress")+":8080/geojson/"+files[0],
+                    "http://"+getServerProperties("IPAddress")+":8080/geojson/"+files[1],
+                    "http://"+getServerProperties("IPAddress")+":8080/geojson/"+files[2],
+                    "http://"+getServerProperties("IPAddress")+":8080/geojson/"+files[3],
+                    files[0],
+                    files[1],
+                    files[2],
+                    files[3]);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        mProgressDialog.setOnCancelListener(dialog -> downloadFile.cancel(true));
+    }
+
+
     private void loadFile(){
+        // First we search if there is a known position for the user
         getPrefs();
+
+        // Set up the Webview
         WebView webView = findViewById(R.id.webView);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setAllowFileAccessFromFileURLs(true);
         webView.getSettings().setAllowUniversalAccessFromFileURLs(true);
         webView.setWebViewClient(new WebViewClient());
+
+        // Replace the properties with the correct values and then load the html file in the browser
         String content;
         try{
             content = IOUtils.toString(getAssets().open("mobileTest.html"),Charset.forName("UTF-8"))
@@ -107,61 +181,5 @@ public class MainActivity extends AppCompatActivity {
         // If there is no known position, we center the map on Paris
         latitude = userPrefs.getFloat("lastKnownLatitude",DEFAULT_LATITUDE);
         longitude = userPrefs.getFloat("lastKnownLongitude",DEFAULT_LONGITUDE);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (grantResults[0] == PERMISSION_DENIED ){
-            Toast.makeText(getBaseContext(), "You doesn't allow the app to access the location, some services may not work properly", Toast.LENGTH_LONG).show();
-        }
-        if (grantResults[0] == PERMISSION_GRANTED){
-            launchLocalisationService();
-            // We now have the permission, we wait 1 second and reload the page with the new localisation
-            Handler handler = new Handler();
-            handler.postDelayed(() -> {
-                getPrefs();
-                loadFile();
-            }, 1000);
-        }
-    }
-
-    private void launchLocalisationService(){
-        Intent intent = new Intent(this, GPSService.class);
-        startService(intent);
-    }
-
-    private void updateJson(){
-        // declare the dialog as a member field of your activity
-        ProgressDialog mProgressDialog;
-
-// instantiate it within the onCreate method
-        mProgressDialog = new ProgressDialog(MainActivity.this);
-        mProgressDialog.setMessage("Update informations from the server");
-        mProgressDialog.setIndeterminate(true);
-        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        mProgressDialog.setCancelable(true);
-
-// execute this when the downloader must be fired
-        final DownloadFile downloadFile = new DownloadFile(MainActivity.this, mProgressDialog);
-        try {
-            downloadFile.execute("http://"+getServerProperties("IPAddress")+":8080/geojson/"+files[0],
-                    "http://"+getServerProperties("IPAddress")+":8080/geojson/"+files[1],
-                    "http://"+getServerProperties("IPAddress")+":8080/geojson/"+files[2],
-                    "http://"+getServerProperties("IPAddress")+":8080/geojson/"+files[3],
-                    files[0],
-                    files[1],
-                    files[2],
-                    files[3]);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        mProgressDialog.setOnCancelListener(dialog -> downloadFile.cancel(true));
-    }
-
-    @Override
-    protected void onDestroy() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
-        super.onDestroy();
     }
 }
