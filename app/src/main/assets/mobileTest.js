@@ -2,6 +2,7 @@ var map;
 
 function afficherMap(longitude, latitude){
 
+
           var vectorLayer = new ol.layer.Vector({
               source: new ol.source.Vector({
                   format: new ol.format.GeoJSON({
@@ -19,6 +20,22 @@ function afficherMap(longitude, latitude){
                       })
                   }))
               })
+          });
+          /*
+          vectorLayer.on('click', function(event){
+              var coordinate = ol.proj.transform(event.coordinate, 'EPSG:3857', 'EPSG:4326');
+              window.alert(coordinate[0] + ", " + coordinate[1]);
+          });
+          */
+          vectorLayer.on("singleclick", function(event){
+              var feature = vectorLayer.getFeaturesAtPixel(event.pixel);
+              if(null != feature){
+                  window.alert("there are features :)");
+                  e.preventDefault();
+              }else{
+                  window.alert("there are no features :(");
+                  e.preventDefault();
+              }
           });
 
     var map = new ol.Map({
