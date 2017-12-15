@@ -1,17 +1,19 @@
 package com.sig.galherret.structuresjudiciairessig.view;
 
 import android.Manifest;
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
@@ -21,6 +23,7 @@ import com.sig.galherret.structuresjudiciairessig.R;
 import com.sig.galherret.structuresjudiciairessig.model.GPSService;
 
 import org.apache.commons.io.IOUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -35,6 +38,21 @@ public class MainActivity extends AppCompatActivity {
     private float latitude;
     private final float DEFAULT_LATITUDE = 48.859489f;
     private final float DEFAULT_LONGITUDE = 2.320582f;
+    private final String[] files = { "annuaire_ti.json", "annuaire_tgi.json", "annuaire_lieux_justice.json", "liste-des-greffes.json"};
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            boolean status = intent.getBooleanExtra("status",false);
+            if(status) {
+                for(String file : files) {
+                    context.deleteFile(file);
+                }
+            }
+            loadFile();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +64,10 @@ public class MainActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(this,permissions,42);
 
         manageToolbar();
-
+        updateJson();
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+                new IntentFilter("download"));
+        launchLocalisationService();
         loadFile();
     }
 
@@ -73,9 +94,9 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(l -> loadFile());
     }
 
-    private String getServerProperties(String key,Context context) throws IOException {
+    private String getServerProperties(String key) throws IOException {
         Properties properties = new Properties();
-        AssetManager assetManager = context.getAssets();
+        AssetManager assetManager = getAssets();
         InputStream inputStream = assetManager.open("server.properties");
         properties.load(inputStream);
         return properties.getProperty(key);
@@ -92,18 +113,55 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (grantResults[0] == PERMISSION_DENIED ){
-            Toast.makeText(getBaseContext(), "You have to allow the app to access the location. Please do this and restart the app", Toast.LENGTH_LONG).show();
+            Toast.makeText(getBaseContext(), "You doesn't allow the app to access the location, some services may not work properly", Toast.LENGTH_LONG).show();
         }
         if (grantResults[0] == PERMISSION_GRANTED){
-            Intent intent = new Intent(this, GPSService.class);
-            startService(intent);
+            launchLocalisationService();
+            // We now have the permission, we wait 1 second and reload the page with the new localisation
             Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                public void run() {
-                    getPrefs();
-                    loadFile();
-                }
+            handler.postDelayed(() -> {
+                getPrefs();
+                loadFile();
             }, 1000);
         }
+    }
+
+    private void launchLocalisationService(){
+        Intent intent = new Intent(this, GPSService.class);
+        startService(intent);
+    }
+
+    private void updateJson(){
+        // declare the dialog as a member field of your activity
+        ProgressDialog mProgressDialog;
+
+// instantiate it within the onCreate method
+        mProgressDialog = new ProgressDialog(MainActivity.this);
+        mProgressDialog.setMessage("Update informations from the server");
+        mProgressDialog.setIndeterminate(true);
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        mProgressDialog.setCancelable(true);
+
+// execute this when the downloader must be fired
+        final DownloadFile downloadFile = new DownloadFile(MainActivity.this, mProgressDialog);
+        try {
+            downloadFile.execute("http://"+getServerProperties("IPAddress")+":8080/geojson/"+files[0],
+                    "http://"+getServerProperties("IPAddress")+":8080/geojson/"+files[1],
+                    "http://"+getServerProperties("IPAddress")+":8080/geojson/"+files[2],
+                    "http://"+getServerProperties("IPAddress")+":8080/geojson/"+files[3],
+                    files[0],
+                    files[1],
+                    files[2],
+                    files[3]);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        mProgressDialog.setOnCancelListener(dialog -> downloadFile.cancel(true));
+    }
+
+    @Override
+    protected void onDestroy() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+        super.onDestroy();
     }
 }

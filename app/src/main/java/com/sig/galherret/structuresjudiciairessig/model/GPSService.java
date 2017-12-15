@@ -5,6 +5,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -39,22 +40,29 @@ public class GPSService extends Service implements LocationListener {
             locationAvailable = false;
 
         } else {
-            if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 locationAvailable = false;
             } else {
                 locationAvailable = true;
+                launchListening();
             }
-
-            // We store the location of the user at the start of the service..
-            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if (null != location) {
-                saveCoordinates(location);
-            }
-            //.. and if he move we actualize it every second
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                    1000,   // 3 sec
-                    0.05f, this);
         }
+    }
+
+    private void launchListening() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            locationAvailable=false;
+            return;
+        }
+        // We store the location of the user at the start of the service..
+        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (null != location && locationAvailable) {
+            saveCoordinates(location);
+        }
+        //.. and if he move we actualize it every second
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                1000,   // 3 sec
+                0.05f, this);
     }
 
     @Nullable
@@ -65,7 +73,7 @@ public class GPSService extends Service implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        if(locationAvailable && null != location) {
+        if(null != location && locationAvailable) {
             saveCoordinates(location);
         }
     }
@@ -80,6 +88,7 @@ public class GPSService extends Service implements LocationListener {
     public void onProviderEnabled(String provider) {
         Toast.makeText(getBaseContext(), "Gps turned on", Toast.LENGTH_LONG).show();
         locationAvailable = true;
+        launchListening();
     }
 
     @Override
