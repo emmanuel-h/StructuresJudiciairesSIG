@@ -13,15 +13,11 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-/**
- * Created by emmanuelh on 15/12/17.
- */
-
 public class DownloadFile extends AsyncTask<String, Integer, String> {
 
     private Context context;
     private PowerManager.WakeLock mWakeLock;
-    // Declaration of the progress dialog to be able to communicate with the UI inside the AsynTask class
+    // Declaration of the progress dialog to be able to communicate with the UI inside the AsyncTask class
     private ProgressDialog mProgressDialog;
 
     DownloadFile(Context context, ProgressDialog _mProgressDialog) {

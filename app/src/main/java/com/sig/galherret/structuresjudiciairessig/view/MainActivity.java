@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         ProgressDialog mProgressDialog;
         mProgressDialog = new ProgressDialog(MainActivity.this);
         mProgressDialog.setMessage("Update informations from the server");
-        mProgressDialog.setIndeterminate(true);
+        //mProgressDialog.setIndeterminate(true);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         mProgressDialog.setCancelable(true);
 
@@ -154,10 +154,10 @@ public class MainActivity extends AppCompatActivity {
         // Replace the properties with the correct values and then load the html file in the browser
         String content;
         try{
-            content = IOUtils.toString(getAssets().open("mobileTest.html"),Charset.forName("UTF-8"))
+            content = IOUtils.toString(getAssets().open("mobileWebPage.html"),Charset.forName("UTF-8"))
                     .replaceAll("%LATITUDE%", String.valueOf(latitude))
                     .replaceAll("%LONGITUDE%", String.valueOf(longitude));
-            webView.loadDataWithBaseURL("file:///android_asset/mobileTest.html", content, "text/html", "UTF-8", null);
+            webView.loadDataWithBaseURL("file:///android_asset/mobileWebPage.html", content, "text/html", "UTF-8", null);
         } catch (IOException e){
             e.printStackTrace();
         }
