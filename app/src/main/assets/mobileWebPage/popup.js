@@ -1,6 +1,8 @@
 var container = document.getElementById('popup');
 var content = document.getElementById('popup-content');
 var closer = document.getElementById('popup-closer');
+var details = document.getElementById('popup-details');
+var buttons = document.getElementById('popup-buttons');
 
 function setPathToInternalStorage(path){
     pathToInternalStorage = path;
@@ -17,6 +19,7 @@ var overlay = new ol.Overlay({
 map.addOverlay(overlay);
 
 closer.onclick = function(){
+    details.innerHTML = "";
     overlay.setPosition(undefined);
     closer.blur();
     return false;
@@ -30,7 +33,7 @@ map.on('click', function(event){
     var feature = map.forEachFeatureAtPixel(event.pixel, function(feature, layer){
         layerUrl = layer.getSource().getUrl();
         return feature;
-    }, 75);
+    }, 125);
     if(feature){
         var properties = feature.getProperties();
         var coord = feature.getGeometry().getCoordinates();
@@ -44,10 +47,13 @@ map.on('click', function(event){
                 listeGreffes(properties, coord);
                 break;
             default:
-                content.innerHTML = '<p>' + layerUrl + '<br>' + pathToInternalStorage + '</p>';
+                content.innerHTML = '<h3>Could not retrieve data for this point</h3>';
                 break;
         }
         overlay.setPosition(coord);
+    }else{
+        details.innerHTML = "";
+        overlay.setPosition(undefined);
     }
 
     function annuaire(properties, coord){
@@ -56,9 +62,25 @@ map.on('click', function(event){
                                 properties.ADRESSE + '<br>' +
                                 properties.CODE_POSTA + '<br>' +
                                 properties.COMMUNE + '<br>' +
-                                properties.TELEPHONE +
-                            '</p>' +
-                            '<button type="button">Website</button>';
+                                properties.TELEPHONE + '<br>' +
+                                properties.HORAIRES_O +
+                            '</p>';
+        buttons.innerHTML = '<button type="button" id="buttonLoadSite">Website</button>' +
+                            '<button type="button" id="buttonDetails">Details</button>' +
+                            '<button type="button" id="buttonCall">Call</button>' +
+                            '<button type="button" id="buttonDistance">Calculate Distance</button>';
+        document.getElementById('buttonLoadSite').onclick = function(){
+            JSInterface.loadWebsite(properties.URL);
+        }
+        document.getElementById('buttonDetails').onclick = function(){
+            details.innerHTML = 'lol';
+        }
+        document.getElementById('buttonCall').onclick = function(){
+            JSInterface.makeCall('0624766258');
+        }
+        document.getElementById('buttonDistance').onclick = function(){
+            JSInterface.calcDistance(+properties.LONGITUDE, +properties.LATITUDE);
+        }
     }
     function listeGreffes(properties, coord){
         content.innerHTML = '<h3>Greffe de ' + properties.GREFFE + '</h3>' +
@@ -66,10 +88,28 @@ map.on('click', function(event){
                                 properties.ADRESSE + '<br>' +
                                 properties.CODE_POSTA + '<br>' +
                                 properties.VILLE + '<br>' +
-                                '0' + properties.TELEPHONE +
-                            '</p>' +
-                            '<button type="button">Website</button>';
+                                '0' + properties.TELEPHONE + '<br>' +
+                                properties.HORAIRES +
+                            '</p>';
+        buttons.innerHTML = '<button type="button" id="buttonLoadSite">Website</button>' +
+                                    '<button type="button" id="buttonDetails">Details</button>' +
+                                    '<button type="button" id="buttonCall">Call</button>' +
+                                    '<button type="button" id="buttonDistance">Calculate Distance</button>';
+        document.getElementById('buttonLoadSite').onclick = function(){
+            JSInterface.loadWebsite(properties.URL);
+        }
+        document.getElementById('buttonDetails').onclick = function(){
+            details.innerHTML = 'lol';
+        }
+        document.getElementById('buttonCall').onclick = function(){
+            JSInterface.makeCall('0624766258');
+        }
+        document.getElementById('buttonDistance').onclick = function(){
+            JSInterface.calcDistance(+properties.LONGITUDE, +properties.LATITUDE);
+        }
     }
 });
+
+
 
 

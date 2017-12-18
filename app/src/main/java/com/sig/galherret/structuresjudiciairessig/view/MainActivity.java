@@ -8,12 +8,14 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
@@ -29,12 +31,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import static android.content.pm.PackageManager.PERMISSION_DENIED;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 public class MainActivity extends AppCompatActivity {
 
+    private WebView webView;
     private float longitude;
     private float latitude;
     private final float DEFAULT_LATITUDE = 48.859489f;
@@ -46,13 +50,45 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
+            String action = intent.getAction();
             boolean status = intent.getBooleanExtra("status",false);
-            if(status) {
-                Toast.makeText(MainActivity.this,"Update complete",Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(MainActivity.this,"Update not worked",Toast.LENGTH_LONG).show();
+            switch(action){
+                case "download":
+                    if(status) {
+                        Toast.makeText(MainActivity.this,"Update complete",Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(MainActivity.this,"Update not worked",Toast.LENGTH_LONG).show();
+                    }
+                    loadFile();
+                    break;
+                case "loadWebsite":
+                    String url = intent.getStringExtra("url");
+                    if(null == url){
+                        Toast.makeText(MainActivity.this,"Could not load this website",Toast.LENGTH_LONG).show();
+                    }else {
+                        Intent mIntent = new Intent(MainActivity.this, WebViewActivity.class);
+                        mIntent.putExtra("url", url);
+                        startActivity(mIntent);
+                    }
+                    break;
+                case "makeCall":
+                    String phoneNumber = intent.getStringExtra("phoneNumber");
+                    if(null == phoneNumber){
+                        Toast.makeText(MainActivity.this,"Could not call this phone number",Toast.LENGTH_LONG).show();
+                    }else {
+                        Intent mIntent = new Intent(Intent.ACTION_DIAL);
+                        mIntent.setData(Uri.parse("tel:" + phoneNumber));
+                        startActivity(mIntent);
+                    }
+                case "calcDistance":
+                    float longitude = intent.getFloatExtra("longitude", 0);
+                    float latitude = intent.getFloatExtra("latitude", 0);
+                    calcDistance(longitude, latitude);
+                    break;
+                default:
+                    Toast.makeText(MainActivity.this,"Nothing received",Toast.LENGTH_LONG).show();
+                    break;
             }
-            loadFile();
         }
     };
 
@@ -67,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(this, permissions, 42);
         // Launch the localisation service
         launchLocalisationService();
+        webView = findViewById(R.id.webView);
         // If there is already a SavedInstanceState, we reload only the desired values
         if(null != savedInstanceState){
             latitude = savedInstanceState.getFloat("latitude");
@@ -76,6 +113,12 @@ public class MainActivity extends AppCompatActivity {
             updateJson();
             LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                     new IntentFilter("download"));
+            LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+                    new IntentFilter("loadWebsite"));
+            LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+                    new IntentFilter("makeCall"));
+            LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+                    new IntentFilter("calcDistance"));
         }
     }
 
@@ -146,13 +189,12 @@ public class MainActivity extends AppCompatActivity {
         getPrefs();
 
         // Set up the Webview
-        WebView webView = findViewById(R.id.webView);
         webView.getSettings().setAllowFileAccessFromFileURLs(true);
         webView.getSettings().setAllowUniversalAccessFromFileURLs(true);
         webView.setWebViewClient(new WebViewClient());
 
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.addJavascriptInterface(new JavascriptConnection(this),"JSInterface");
+        webView.addJavascriptInterface(new JavascriptConnection(MainActivity.this),"JSInterface");
 
         // Replace the properties with the correct values and then load the html file in the browser
         String content;
@@ -185,5 +227,17 @@ public class MainActivity extends AppCompatActivity {
         // If there is no known position, we center the map on Paris
         latitude = userPrefs.getFloat("lastKnownLatitude",DEFAULT_LATITUDE);
         longitude = userPrefs.getFloat("lastKnownLongitude",DEFAULT_LONGITUDE);
+    }
+
+    private void calcDistance(float destLongitude, float destLatitude){
+        getPrefs();
+        double lat1 = latitude * Math.PI / 180;
+        double lat2 = destLatitude * Math.PI / 180;
+        double long1 = longitude * Math.PI / 180;
+        double long2 = destLongitude * Math.PI / 180;
+        double rayon = 6371d;
+        double distance = rayon * Math.acos(Math.cos(lat1) * Math.cos(lat2) * Math.cos(long2 - long1) + Math.sin(lat1) * Math.sin(lat2));
+
+        Toast.makeText(this,"Distance : " + distance,Toast.LENGTH_LONG).show();
     }
 }
