@@ -32,11 +32,9 @@ public class DownloadFile extends AsyncTask<String, Integer, String> {
         HttpURLConnection connection = null;
         try {
             for(int i = 0 ; i < urlsAndOutputsfiles.length/2 ; i++){
-                System.out.println(urlsAndOutputsfiles[i]);
                 // Load the url
                 URL url = new URL(urlsAndOutputsfiles[i]);
                 // Load the desired output file path
-                System.out.println(urlsAndOutputsfiles[i+urlsAndOutputsfiles.length/2]);
                 String outputFile = urlsAndOutputsfiles[i+urlsAndOutputsfiles.length/2];
 
                 // Open the connection to the server

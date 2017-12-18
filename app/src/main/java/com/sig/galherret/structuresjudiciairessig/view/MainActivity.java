@@ -67,8 +67,6 @@ public class MainActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(this, permissions, 42);
         // Launch the localisation service
         launchLocalisationService();
-        // Launch the web file
-        // loadFile();
         // If there is already a SavedInstanceState, we reload only the desired values
         if(null != savedInstanceState){
             latitude = savedInstanceState.getFloat("latitude");
