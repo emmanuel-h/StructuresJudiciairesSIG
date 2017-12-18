@@ -1,6 +1,7 @@
 var container = document.getElementById('popup');
 var content = document.getElementById('popup-content');
 var closer = document.getElementById('popup-closer');
+var originOverlayPos;
 
 function setPathToInternalStorage(path){
     pathToInternalStorage = path;
@@ -15,6 +16,8 @@ var overlay = new ol.Overlay({
 });
 
 map.addOverlay(overlay);
+
+originOverlayPos = overlay.getPosition();
 
 closer.onclick = function(){
     overlay.setPosition(undefined);
@@ -48,6 +51,8 @@ map.on('click', function(event){
                 break;
         }
         overlay.setPosition(coord);
+    }else{
+        overlay.setPosition(originOverlayPos);
     }
 
     function annuaire(properties, coord){
@@ -58,7 +63,7 @@ map.on('click', function(event){
                                 properties.COMMUNE + '<br>' +
                                 properties.TELEPHONE +
                             '</p>' +
-                            '<button type="button">Website</button>';
+                            '<button type="button" onclick="JSInterface.loadWebsite(\''+properties.URL+'\')">Website</button>';
     }
     function listeGreffes(properties, coord){
         content.innerHTML = '<h3>Greffe de ' + properties.GREFFE + '</h3>' +
@@ -68,8 +73,12 @@ map.on('click', function(event){
                                 properties.VILLE + '<br>' +
                                 '0' + properties.TELEPHONE +
                             '</p>' +
-                            '<button type="button">Website</button>';
+                            '<button type="button" onclick="JSInterface.loadWebsite(\''+properties.SITE_DATA_+'\')">Website</button>';
     }
 });
+
+function loadWebsite(url){
+    JSInterface.loadWebsite(url);
+}
 
 

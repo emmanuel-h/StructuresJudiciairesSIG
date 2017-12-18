@@ -21,7 +21,6 @@ import android.widget.Toast;
 
 import com.sig.galherret.structuresjudiciairessig.R;
 import com.sig.galherret.structuresjudiciairessig.model.GPSService;
-import com.sig.galherret.structuresjudiciairessig.model.JavascriptConnection;
 
 import org.apache.commons.io.IOUtils;
 
@@ -29,12 +28,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import static android.content.pm.PackageManager.PERMISSION_DENIED;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 public class MainActivity extends AppCompatActivity {
 
+    private WebView webView;
     private float longitude;
     private float latitude;
     private final float DEFAULT_LATITUDE = 48.859489f;
@@ -46,13 +47,31 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
+            String action = intent.getAction();
             boolean status = intent.getBooleanExtra("status",false);
-            if(status) {
-                Toast.makeText(MainActivity.this,"Update complete",Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(MainActivity.this,"Update not worked",Toast.LENGTH_LONG).show();
+            switch(action){
+                case "download":
+                    if(status) {
+                        Toast.makeText(MainActivity.this,"Update complete",Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(MainActivity.this,"Update not worked",Toast.LENGTH_LONG).show();
+                    }
+                    loadFile();
+                    break;
+                case "loadWebsite":
+                    String url = intent.getStringExtra("url");
+                    if(null == url){
+                        Toast.makeText(MainActivity.this,"Could not load this website",Toast.LENGTH_LONG).show();
+                    }else {
+                        Intent mIntent = new Intent(MainActivity.this, WebViewActivity.class);
+                        mIntent.putExtra("url", url);
+                        startActivity(mIntent);
+                    }
+                    break;
+                default:
+                    Toast.makeText(MainActivity.this,"Nothing received",Toast.LENGTH_LONG).show();
+                    break;
             }
-            loadFile();
         }
     };
 
@@ -69,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
         launchLocalisationService();
         // Launch the web file
         // loadFile();
+        webView = findViewById(R.id.webView);
         // If there is already a SavedInstanceState, we reload only the desired values
         if(null != savedInstanceState){
             latitude = savedInstanceState.getFloat("latitude");
@@ -78,6 +98,8 @@ public class MainActivity extends AppCompatActivity {
             updateJson();
             LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                     new IntentFilter("download"));
+            LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+                    new IntentFilter("loadWebsite"));
         }
     }
 
@@ -148,13 +170,13 @@ public class MainActivity extends AppCompatActivity {
         getPrefs();
 
         // Set up the Webview
-        WebView webView = findViewById(R.id.webView);
+        //WebView webView = findViewById(R.id.webView);
         webView.getSettings().setAllowFileAccessFromFileURLs(true);
         webView.getSettings().setAllowUniversalAccessFromFileURLs(true);
         webView.setWebViewClient(new WebViewClient());
 
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.addJavascriptInterface(new JavascriptConnection(this),"JSInterface");
+        webView.addJavascriptInterface(new JavascriptConnection(MainActivity.this),"JSInterface");
 
         // Replace the properties with the correct values and then load the html file in the browser
         String content;
@@ -187,5 +209,9 @@ public class MainActivity extends AppCompatActivity {
         // If there is no known position, we center the map on Paris
         latitude = userPrefs.getFloat("lastKnownLatitude",DEFAULT_LATITUDE);
         longitude = userPrefs.getFloat("lastKnownLongitude",DEFAULT_LONGITUDE);
+    }
+
+    public void loadWebsite(String url){
+
     }
 }
