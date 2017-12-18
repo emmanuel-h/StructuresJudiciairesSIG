@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.URL;
 
 public class DownloadFile extends AsyncTask<String, Integer, String> {
@@ -39,6 +40,7 @@ public class DownloadFile extends AsyncTask<String, Integer, String> {
 
                 // Open the connection to the server
                 connection = (HttpURLConnection) url.openConnection();
+                connection.setConnectTimeout(2000);
                 connection.setRequestMethod("GET");
                 connection.setDoOutput(true);
                 connection.connect();
@@ -71,6 +73,7 @@ public class DownloadFile extends AsyncTask<String, Integer, String> {
                 }
             }
         } catch (Exception e) {
+            System.out.println("Erreur " + e.toString());
             return e.toString();
         } finally {
             try {
