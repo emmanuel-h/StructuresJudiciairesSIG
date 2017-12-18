@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.sig.galherret.structuresjudiciairessig.R;
 import com.sig.galherret.structuresjudiciairessig.model.GPSService;
+import com.sig.galherret.structuresjudiciairessig.model.JavascriptConnection;
 
 import org.apache.commons.io.IOUtils;
 
@@ -38,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
     private float latitude;
     private final float DEFAULT_LATITUDE = 48.859489f;
     private final float DEFAULT_LONGITUDE = 2.320582f;
-    private final String[] files = { "annuaire_ti.json", "annuaire_tgi.json", "annuaire_lieux_justice.json", "liste-des-greffes.json"};
+    private final String[] files = {"annuaire_ti.json", "annuaire_tgi.json", "annuaire_lieux_justice.json", "liste-des-greffes.json"};
+    private String PATH_TO_INTERNAL_STORAGE;
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
@@ -46,9 +48,9 @@ public class MainActivity extends AppCompatActivity {
             // Get extra data included in the Intent
             boolean status = intent.getBooleanExtra("status",false);
             if(status) {
-                for(String file : files) {
-                    context.deleteFile(file);
-                }
+                Toast.makeText(MainActivity.this,"Update complete",Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(MainActivity.this,"Update not worked",Toast.LENGTH_LONG).show();
             }
             loadFile();
         }
@@ -58,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        PATH_TO_INTERNAL_STORAGE = getFilesDir().getAbsolutePath();
         manageToolbar();
         // We ask the user to access the location
         String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
@@ -65,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         // Launch the localisation service
         launchLocalisationService();
         // Launch the web file
-        loadFile();
+        // loadFile();
         // If there is already a SavedInstanceState, we reload only the desired values
         if(null != savedInstanceState){
             latitude = savedInstanceState.getFloat("latitude");
@@ -146,18 +149,21 @@ public class MainActivity extends AppCompatActivity {
 
         // Set up the Webview
         WebView webView = findViewById(R.id.webView);
-        webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setAllowFileAccessFromFileURLs(true);
         webView.getSettings().setAllowUniversalAccessFromFileURLs(true);
         webView.setWebViewClient(new WebViewClient());
 
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.addJavascriptInterface(new JavascriptConnection(this),"JSInterface");
+
         // Replace the properties with the correct values and then load the html file in the browser
         String content;
         try{
-            content = IOUtils.toString(getAssets().open("mobileWebPage.html"),Charset.forName("UTF-8"))
+            content = IOUtils.toString(getAssets().open("mobileWebPage/mobileWebPage.html"),Charset.forName("UTF-8"))
                     .replaceAll("%LATITUDE%", String.valueOf(latitude))
-                    .replaceAll("%LONGITUDE%", String.valueOf(longitude));
-            webView.loadDataWithBaseURL("file:///android_asset/mobileWebPage.html", content, "text/html", "UTF-8", null);
+                    .replaceAll("%LONGITUDE%", String.valueOf(longitude))
+                    .replaceAll("%PATH_TO_INTERNAL_STORAGE%", String.valueOf(PATH_TO_INTERNAL_STORAGE));
+            webView.loadDataWithBaseURL("file:///android_asset/mobileWebPage/mobileWebPage.html", content, "text/html", "UTF-8", null);
         } catch (IOException e){
             e.printStackTrace();
         }
