@@ -14,7 +14,8 @@ function afficherMap(longitude, latitude, path_to_internal_storage){
   map = new ol.Map({
       layers: [
         new ol.layer.Tile({
-          source: new ol.source.OSM()
+          source: new ol.source.OSM(),
+          strategy: ol.loadingstrategy.bbox
         }),
         vectorLayerTi, vectorLayerLieuxJustice, vectorLayerListeGreffes, vectorLayerTgi
       ],
@@ -59,7 +60,8 @@ function createLayer(file,colorPoint,index,minR,maxR){
         defaultDataProjection:'EPSG:4326',
         projection:'EPSG:3857'
       }),
-      url: file
+      url: file,
+      strategy: ol.loadingstrategy.bbox
     }),
     style: new ol.style.Style({
       image: new ol.style.Circle(({

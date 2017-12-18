@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
         mProgressDialog.setMessage("Update informations from the server");
         //mProgressDialog.setIndeterminate(true);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        mProgressDialog.setCancelable(true);
+        mProgressDialog.setCancelable(false);
 
         // Launch the download async task
         final DownloadFile downloadFile = new DownloadFile(MainActivity.this, mProgressDialog);
