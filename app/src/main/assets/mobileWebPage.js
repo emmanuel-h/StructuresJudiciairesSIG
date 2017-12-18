@@ -1,23 +1,5 @@
 var map;
 
-var container = document.getElementById('popup');
-var content = document.getElementById('popup-content');
-var closer = document.getElementById('popup-closer');
-
-var overlay = new ol.Overlay({
-  element:container,
-  autopan:true,
-  autoPanAnimation: {
-    duration:250
-  }
-});
-
-closer.onclick = function(){
-  overlay.setPosition(undefined);
-  closer.blur();
-  return false;
-};
-
 function afficherMap(longitude, latitude){
   var vectorLayer = new ol.layer.Vector({
     source: new ol.source.Vector({
@@ -43,55 +25,20 @@ function afficherMap(longitude, latitude){
   var vectorLayerListeGreffes = createLayer('liste-des-greffes.json','#0000ff',2,0.1,3000);
   var vectorLayerLieuxJustice = createLayer('annuaire_lieux_justice.json','#ffff00',1,0.1,500);
 
-  /*
-  vectorLayerTi.on('click', function(event){
-  var coordinate = event.coordinate;
-  var coordProj = ol.proj.transform(coordinate, 'EPSG:3857', 'EPSG:4326');
-  content.innerHTML = '<p>Click click TI on ' + ol.coordinate.toStringXY(coordProj, 3) + '</p>';
-  overlay.setPosition(coordinate);
-});
-vectorLayerTgi.on('click', function(event){
-var coordinate = event.coordinate;
-var coordProj = ol.proj.transform(coordinate, 'EPSG:3857', 'EPSG:4326');
-content.innerHTML = '<p>Click click TGI on ' + ol.coordinate.toStringXY(coordProj, 3) + '</p>';
-overlay.setPosition(coordinate);
-});
-vectorLayerListeGreffes.on('click', function(event){
-var coordinate = event.coordinate;
-var coordProj = ol.proj.transform(coordinate, 'EPSG:3857', 'EPSG:4326');
-content.innerHTML = '<p>Click click GREFFES on ' + ol.coordinate.toStringXY(coordProj, 3) + '</p>';
-overlay.setPosition(coordinate);
-});
-vectorLayerLieuxJustice.on('click', function(event){
-var coordinate = event.coordinate;
-var coordProj = ol.proj.transform(coordinate, 'EPSG:3857', 'EPSG:4326');
-content.innerHTML = '<p>Click click LIEUX on ' + ol.coordinate.toStringXY(coordProj, 3) + '</p>';
-overlay.setPosition(coordinate);
-});
-*/
-
 //création de la map avec OSM et les differents layers
-var map = new ol.Map({
-  layers: [
-    new ol.layer.Tile({
-      source: new ol.source.OSM()
-    }),
-    vectorLayerTi, vectorLayerLieuxJustice, vectorLayerListeGreffes, vectorLayerTgi
-  ],
-  overlays: [overlay],
-  target: 'map',
-  view: new ol.View({
-    center: ol.proj.transform([+longitude,+latitude], 'EPSG:4326','EPSG:3857'),
-    zoom: 11
-  })
-});
-
-map.on('click', function(event){
-  var coordinate = event.coordinate;
-  var coordProj = ol.proj.transform(coordinate, 'EPSG:3857', 'EPSG:4326');
-  content.innerHTML = '<p>Click click on ' + ol.coordinate.toStringXY(coordProj, 3) + '</p>';
-  overlay.setPosition(coordinate);
-});
+  map = new ol.Map({
+      layers: [
+        new ol.layer.Tile({
+          source: new ol.source.OSM()
+        }),
+        vectorLayerTi, vectorLayerLieuxJustice, vectorLayerListeGreffes, vectorLayerTgi
+      ],
+      target: 'map',
+      view: new ol.View({
+        center: ol.proj.transform([+longitude,+latitude], 'EPSG:4326','EPSG:3857'),
+        zoom: 11
+      })
+  });
 
 
 //catch de l'event de mouvement de la map et application de la fonction de changement de style des layers
