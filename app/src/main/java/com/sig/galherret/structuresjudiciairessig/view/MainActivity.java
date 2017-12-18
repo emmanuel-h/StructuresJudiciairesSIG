@@ -103,8 +103,6 @@ public class MainActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(this, permissions, 42);
         // Launch the localisation service
         launchLocalisationService();
-        // Launch the web file
-        // loadFile();
         webView = findViewById(R.id.webView);
         // If there is already a SavedInstanceState, we reload only the desired values
         if(null != savedInstanceState){
@@ -166,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
         mProgressDialog.setMessage("Update informations from the server");
         //mProgressDialog.setIndeterminate(true);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        mProgressDialog.setCancelable(true);
+        mProgressDialog.setCancelable(false);
 
         // Launch the download async task
         final DownloadFile downloadFile = new DownloadFile(MainActivity.this, mProgressDialog);
@@ -191,7 +189,6 @@ public class MainActivity extends AppCompatActivity {
         getPrefs();
 
         // Set up the Webview
-        //WebView webView = findViewById(R.id.webView);
         webView.getSettings().setAllowFileAccessFromFileURLs(true);
         webView.getSettings().setAllowUniversalAccessFromFileURLs(true);
         webView.setWebViewClient(new WebViewClient());
