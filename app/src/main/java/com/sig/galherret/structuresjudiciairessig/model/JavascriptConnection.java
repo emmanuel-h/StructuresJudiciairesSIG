@@ -1,4 +1,4 @@
-package com.sig.galherret.structuresjudiciairessig.view;
+package com.sig.galherret.structuresjudiciairessig.model;
 
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +23,21 @@ public class JavascriptConnection {
     public void loadWebsite(String url){
         Intent intent = new Intent("loadWebsite");
         intent.putExtra("url", url);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+
+    @JavascriptInterface
+    public void makeCall(String phoneNumber){
+        Intent intent = new Intent("makeCall");
+        intent.putExtra("phoneNumber", phoneNumber);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+
+    @JavascriptInterface
+    public void calcDistance(float longitude, float latitude){
+        Intent intent = new Intent("calcDistance");
+        intent.putExtra("longitude", longitude);
+        intent.putExtra("latitude", latitude);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 

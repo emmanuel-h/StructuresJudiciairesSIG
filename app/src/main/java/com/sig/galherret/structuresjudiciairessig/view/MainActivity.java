@@ -8,12 +8,14 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
@@ -21,6 +23,7 @@ import android.widget.Toast;
 
 import com.sig.galherret.structuresjudiciairessig.R;
 import com.sig.galherret.structuresjudiciairessig.model.GPSService;
+import com.sig.galherret.structuresjudiciairessig.model.JavascriptConnection;
 
 import org.apache.commons.io.IOUtils;
 
@@ -68,6 +71,20 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(mIntent);
                     }
                     break;
+                case "makeCall":
+                    String phoneNumber = intent.getStringExtra("phoneNumber");
+                    if(null == phoneNumber){
+                        Toast.makeText(MainActivity.this,"Could not call this phone number",Toast.LENGTH_LONG).show();
+                    }else {
+                        Intent mIntent = new Intent(Intent.ACTION_DIAL);
+                        mIntent.setData(Uri.parse("tel:" + phoneNumber));
+                        startActivity(mIntent);
+                    }
+                case "calcDistance":
+                    float longitude = intent.getFloatExtra("longitude", 0);
+                    float latitude = intent.getFloatExtra("latitude", 0);
+                    calcDistance(longitude, latitude);
+                    break;
                 default:
                     Toast.makeText(MainActivity.this,"Nothing received",Toast.LENGTH_LONG).show();
                     break;
@@ -100,6 +117,10 @@ public class MainActivity extends AppCompatActivity {
                     new IntentFilter("download"));
             LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                     new IntentFilter("loadWebsite"));
+            LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+                    new IntentFilter("makeCall"));
+            LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+                    new IntentFilter("calcDistance"));
         }
     }
 
@@ -211,7 +232,15 @@ public class MainActivity extends AppCompatActivity {
         longitude = userPrefs.getFloat("lastKnownLongitude",DEFAULT_LONGITUDE);
     }
 
-    public void loadWebsite(String url){
+    private void calcDistance(float destLongitude, float destLatitude){
+        getPrefs();
+        double lat1 = latitude * Math.PI / 180;
+        double lat2 = destLatitude * Math.PI / 180;
+        double long1 = longitude * Math.PI / 180;
+        double long2 = destLongitude * Math.PI / 180;
+        double rayon = 6371d;
+        double distance = rayon * Math.acos(Math.cos(lat1) * Math.cos(lat2) * Math.cos(long2 - long1) + Math.sin(lat1) * Math.sin(lat2));
 
+        Toast.makeText(this,"Distance : " + distance,Toast.LENGTH_LONG).show();
     }
 }
