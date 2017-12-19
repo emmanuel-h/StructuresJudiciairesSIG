@@ -15,7 +15,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
@@ -31,7 +30,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 import static android.content.pm.PackageManager.PERMISSION_DENIED;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
@@ -80,10 +78,10 @@ public class MainActivity extends AppCompatActivity {
                         mIntent.setData(Uri.parse("tel:" + phoneNumber));
                         startActivity(mIntent);
                     }
-                case "calcDistance":
+                case "updateLocation":
                     float longitude = intent.getFloatExtra("longitude", 0);
                     float latitude = intent.getFloatExtra("latitude", 0);
-                    calcDistance(longitude, latitude);
+                    webView.loadUrl("javascript:updateLocation(" + longitude + ", " + latitude + ")");
                     break;
                 default:
                     Toast.makeText(MainActivity.this,"Nothing received",Toast.LENGTH_LONG).show();
@@ -118,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
             LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                     new IntentFilter("makeCall"));
             LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
-                    new IntentFilter("calcDistance"));
+                    new IntentFilter("updateLocation"));
         }
     }
 
@@ -211,7 +209,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void manageToolbar(){
         Button button = findViewById(R.id.buttonShowMore);
-        button.setOnClickListener(l -> loadFile());
+        button.setOnClickListener(l -> {
+            loadFile();
+        });
     }
 
     private String getServerProperties(String key) throws IOException {

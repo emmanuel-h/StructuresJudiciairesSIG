@@ -14,6 +14,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
@@ -58,7 +59,7 @@ public class GPSService extends Service implements LocationListener {
         }
         //.. and if he move we actualize it every second
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                1000,   // 3 sec
+                1000,   // 1 sec
                 0.05f, this);
     }
 
@@ -72,6 +73,10 @@ public class GPSService extends Service implements LocationListener {
     public void onLocationChanged(Location location) {
         if(null != location && locationAvailable) {
             saveCoordinates(location);
+            Intent intent = new Intent("updateLocation");
+            intent.putExtra("longitude",location.getLongitude());
+            intent.putExtra("latitude", location.getLatitude());
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         }
     }
 

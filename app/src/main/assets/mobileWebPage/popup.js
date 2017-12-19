@@ -3,6 +3,7 @@ var content = document.getElementById('popup-content');
 var closer = document.getElementById('popup-closer');
 var details = document.getElementById('popup-details');
 var buttons = document.getElementById('popup-buttons');
+var vectorLine;
 
 function setPathToInternalStorage(path){
     pathToInternalStorage = path;
@@ -21,6 +22,7 @@ map.addOverlay(overlay);
 closer.onclick = function(){
     details.innerHTML = "";
     overlay.setPosition(undefined);
+    map.removeLayer(vectorLine);
     closer.blur();
     return false;
 };
@@ -54,6 +56,7 @@ map.on('click', function(event){
     }else{
         details.innerHTML = "";
         overlay.setPosition(undefined);
+        map.removeLayer(vectorLine);
     }
 
     function annuaire(properties, coord){
@@ -73,13 +76,14 @@ map.on('click', function(event){
             JSInterface.loadWebsite(properties.URL);
         }
         document.getElementById('buttonDetails').onclick = function(){
-            details.innerHTML = 'lol';
+            details.innerHTML = 'show details';
         }
         document.getElementById('buttonCall').onclick = function(){
             JSInterface.makeCall('0624766258');
         }
         document.getElementById('buttonDistance').onclick = function(){
-            JSInterface.calcDistance(+properties.LONGITUDE, +properties.LATITUDE);
+            //JSInterface.calcDistance(+properties.LONGITUDE, +properties.LATITUDE);
+            calcDistance(+properties.LONGITUDE, +properties.LATITUDE);
         }
     }
     function listeGreffes(properties, coord){
@@ -99,14 +103,45 @@ map.on('click', function(event){
             JSInterface.loadWebsite(properties.URL);
         }
         document.getElementById('buttonDetails').onclick = function(){
-            details.innerHTML = 'lol';
+            details.innerHTML = 'view details';
         }
         document.getElementById('buttonCall').onclick = function(){
             JSInterface.makeCall('0624766258');
         }
         document.getElementById('buttonDistance').onclick = function(){
-            JSInterface.calcDistance(+properties.LONGITUDE, +properties.LATITUDE);
+            calcDistance(+properties.LONGITUDE, +properties.LATITUDE);
         }
+    }
+    function calcDistance(destLongitude, destLatitude){
+        var lat1 = latitude * Math.PI / 180;
+        var lat2 = destLatitude * Math.PI / 180;
+        var long1 = longitude * Math.PI / 180;
+        var long2 = destLongitude * Math.PI / 180;
+        var rayon = 6371;
+        var distance = rayon * Math.acos(Math.cos(lat1) * Math.cos(lat2) * Math.cos(long2 - long1) + Math.sin(lat1) * Math.sin(lat2));
+        details.innerHTML += '<p>Distance au point : ' + distance.toFixed(2) + ' Km</p>';
+
+        var userPos = ol.proj.transform([+longitude,+latitude], 'EPSG:4326','EPSG:3857');
+        var destPos = ol.proj.transform([+destLongitude,+destLatitude], 'EPSG:4326','EPSG:3857')
+        var points = [userPos, destPos];
+        var featureLine = new ol.Feature({
+            geometry:new ol.geom.LineString(points)
+        });
+        var sourceVector = new ol.source.Vector({
+            features:[featureLine]
+        });
+        vectorLine = new ol.layer.Vector({
+            source:sourceVector,
+            style:new ol.style.Style({
+                stroke:new ol.style.Stroke({
+                    color:'#33ccff',
+                    width:3
+                })
+            }),
+            zIndex:5
+        });
+        map.addLayer(vectorLine);
+
     }
 });
 

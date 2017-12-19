@@ -1,6 +1,13 @@
 var map;
+var longitude;
+var latitude;
 
 var pathToInternalStorage;
+
+function updateLocation(long, lat){
+    longitude = long;
+    latitude = lat;
+}
 
 function afficherMap(longitude, latitude, path_to_internal_storage){
   var vectorLayerTi = createLayer(path_to_internal_storage+'/annuaire_ti.json','#ff0000',3,0.1,2500);
