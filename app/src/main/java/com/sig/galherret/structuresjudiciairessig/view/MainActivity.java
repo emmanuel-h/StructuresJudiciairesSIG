@@ -257,6 +257,12 @@ public class MainActivity extends AppCompatActivity {
         buttonShowMore.setOnClickListener(l -> loadFile());
         Button buttonClear = findViewById(R.id.buttonClear);
         buttonClear.setOnClickListener(l -> clearItinerary());
+        Button buttonCenter = findViewById(R.id.buttonCenter);
+        buttonCenter.setOnClickListener(l -> centerMap());
+    }
+
+    private void centerMap() {
+        webView.loadUrl("javascript:centerMap()");
     }
 
     private String getServerProperties(String key) throws IOException {

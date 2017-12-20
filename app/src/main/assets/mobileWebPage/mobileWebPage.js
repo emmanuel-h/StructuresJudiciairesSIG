@@ -13,6 +13,10 @@ function updateLocation(long, lat){
     latitude = lat;
 }
 
+function centerMap(){
+   map.getView().setCenter(ol.proj.transform([longitude, latitude], 'EPSG:4326', 'EPSG:3857'));
+}
+
 function clearItinerary(){
     map.removeLayer(itineraryLine);
 }
