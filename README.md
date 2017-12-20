@@ -10,18 +10,18 @@
 	<ul>
 	<li>
 	a. FWTools (the jar is in the project root directory :<br>
-		tar xzvf FWTools-linux-2.0.6.tar.gz<br>
-		cd FWTools-linux-2.0.6<br>
-		./install.sh
+		&emsp;tar xzvf FWTools-linux-2.0.6.tar.gz<br>
+		&emsp;cd FWTools-linux-2.0.6<br>
+		&emsp;./install.sh
 	</li>
 	<li>
 	b. mapshaper. You must have Node.js on your computer, and not the old version in ubuntu packages. You can install the latest version with :<br>
-		curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash - <br>
-		sudo apt-get install -y nodejs) :<br>
+		&emsp;curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash - <br>
+		&emsp;sudo apt-get install -y nodejs) :<br>
 	   To install mapshaper :<br>
-		git clone https://github.com/mbloch/mapshaper<br>
-		cd mapshaper<br>
-		npm install
+		&emsp;git clone https://github.com/mbloch/mapshaper<br>
+		&emsp;cd mapshaper<br>
+		&emsp;npm install
 	</li>
 	</ul>
 </li>
