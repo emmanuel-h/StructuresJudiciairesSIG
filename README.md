@@ -27,7 +27,13 @@
 </li>
 <li>
 3. Modify the script entry (at the top of the file) to match your own configuration :
+	<ul>
+	<li>
 	a. The three paths (to your tomcat, mapshaper and the directory to store files)
+	</li>
+	<li>
 	b. The database informations (host, user, password and database name)
+	</li>
+	</ul>
 </li>
 </ul>
