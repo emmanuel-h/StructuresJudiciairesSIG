@@ -25,4 +25,13 @@
         android:backgroundTint="@android:color/white"
         android:visibility="visible" />
 
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/buttonCenter"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginLeft="16dp"
+        android:background="@android:drawable/ic_menu_myplaces"
+        android:backgroundTint="@android:color/white"
+        android:visibility="visible" />
+
 </android.support.v7.widget.Toolbar>

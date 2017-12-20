@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.PowerManager;
 import android.support.v4.content.LocalBroadcastManager;
+import android.widget.Toast;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -37,7 +38,6 @@ public class DownloadFile extends AsyncTask<String, Integer, String> {
                 URL url = new URL(urlsAndOutputsfiles[i]);
                 // Load the desired output file path
                 String outputFile = urlsAndOutputsfiles[i+urlsAndOutputsfiles.length/2];
-
                 // Open the connection to the server
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setConnectTimeout(2000);
@@ -48,14 +48,16 @@ public class DownloadFile extends AsyncTask<String, Integer, String> {
                     return "Server returned HTTP " + connection.getResponseCode()
                             + " " + connection.getResponseMessage();
                 }
-
                 // Used to displayed the percentage of file downloaded
                 int fileLength = connection.getContentLength();
 
                 // download the file
                 input = connection.getInputStream();
+                //Toast.makeText(context,input.toString(),Toast.LENGTH_LONG).show();
+                System.out.println("ICIII");
                 output = context.openFileOutput(outputFile, Context.MODE_PRIVATE);
                 byte data[] = new byte[4096];
+
                 long total = 0;
                 int count;
                 while ((count = input.read(data)) != -1) {

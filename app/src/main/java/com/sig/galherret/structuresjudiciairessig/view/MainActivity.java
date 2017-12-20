@@ -29,6 +29,9 @@ import com.sig.galherret.structuresjudiciairessig.model.JavascriptConnection;
 
 import org.apache.commons.io.IOUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -188,6 +191,8 @@ public class MainActivity extends AppCompatActivity {
                     files[1],
                     files[2],
                     files[3]);
+            downloadFile.execute("http://"+getServerProperties("IPAddress")+":8888",
+                    "test.json");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -269,6 +274,12 @@ public class MainActivity extends AppCompatActivity {
         buttonShowMore.setOnClickListener(l -> loadFile());
         Button buttonAdd = findViewById(R.id.buttonAddLawyer);
         buttonAdd.setOnClickListener(l -> addLawyer());
+        Button buttonCenter = findViewById(R.id.buttonCenter);
+        buttonCenter.setOnClickListener(l -> centerMap());
+    }
+
+    private void centerMap() {
+        webView.loadUrl("javascript:centerMap()");
     }
 
     private String getServerProperties(String key) throws IOException {
