@@ -4,6 +4,7 @@ var closer = document.getElementById('popup-closer');
 var details = document.getElementById('popup-details');
 var buttons = document.getElementById('popup-buttons');
 var vectorLine;
+var itineraryLine;
 
 function setPathToInternalStorage(path){
     pathToInternalStorage = path;
@@ -71,7 +72,8 @@ map.on('click', function(event){
         buttons.innerHTML = '<button type="button" id="buttonLoadSite">Website</button>' +
                             '<button type="button" id="buttonDetails">Details</button>' +
                             '<button type="button" id="buttonCall">Call</button>' +
-                            '<button type="button" id="buttonDistance">Calculate Distance</button>';
+                            '<button type="button" id="buttonDistance">Distance</button>' +
+                            '<button type="button" id="buttonItinerary">Itinerary</button>';
         document.getElementById('buttonLoadSite').onclick = function(){
             JSInterface.loadWebsite(properties.URL);
         }
@@ -84,6 +86,9 @@ map.on('click', function(event){
         document.getElementById('buttonDistance').onclick = function(){
             //JSInterface.calcDistance(+properties.LONGITUDE, +properties.LATITUDE);
             calcDistance(+properties.LONGITUDE, +properties.LATITUDE);
+        }
+        document.getElementById('buttonItinerary').onclick = function(){
+            calcItinerary(+properties.LONGITUDE, +properties.LATITUDE);
         }
     }
     function listeGreffes(properties, coord){
@@ -98,7 +103,8 @@ map.on('click', function(event){
         buttons.innerHTML = '<button type="button" id="buttonLoadSite">Website</button>' +
                                     '<button type="button" id="buttonDetails">Details</button>' +
                                     '<button type="button" id="buttonCall">Call</button>' +
-                                    '<button type="button" id="buttonDistance">Calculate Distance</button>';
+                                    '<button type="button" id="buttonDistance">Distance</button>' +
+                                    '<button type="button" id="buttonItinerary">Itinerary</button>';
         document.getElementById('buttonLoadSite').onclick = function(){
             JSInterface.loadWebsite(properties.URL);
         }
@@ -110,6 +116,9 @@ map.on('click', function(event){
         }
         document.getElementById('buttonDistance').onclick = function(){
             calcDistance(+properties.LONGITUDE, +properties.LATITUDE);
+        }
+        document.getElementById('buttonItinerary').onclick = function(){
+            calcItinerary(+properties.LONGITUDE, +properties.LATITUDE);
         }
     }
     function calcDistance(destLongitude, destLatitude){
@@ -142,6 +151,39 @@ map.on('click', function(event){
         });
         map.addLayer(vectorLine);
 
+    }
+    function calcItinerary(destLongitude, destLatitude){
+        map.removeLayer(itineraryLine);
+        const url = 'http://router.project-osrm.org/route/v1/driving/';
+        const urlOptions = '?steps=true&geometries=geojson&overview=simplified';
+        var finalUrl = url + longitude + ',' + latitude + ';' + destLongitude + ',' + destLatitude + urlOptions;
+        fetch(finalUrl)
+        .then((resp) => resp.json())
+        .then(function(data){
+            var coordinates = data.routes[0].geometry.coordinates;
+            var coordProj = [];
+            for(i = 0; i < coordinates.length; i++){
+                var coordTemp = ol.proj.transform(coordinates[i], 'EPSG:4326', 'EPSG:3857');
+                coordProj.push(coordTemp);
+            }
+            var featureLine = new ol.Feature({
+                geometry:new ol.geom.LineString(coordProj)
+            });
+            var sourceVector = new ol.source.Vector({
+                        features:[featureLine]
+            });
+            itineraryLine = new ol.layer.Vector({
+                source:sourceVector,
+                style:new ol.style.Style({
+                    stroke:new ol.style.Stroke({
+                        color:'#7300e6',
+                        width:3
+                    })
+                }),
+                zIndex:5
+            });
+            map.addLayer(itineraryLine);
+        });
     }
 });
 

@@ -79,8 +79,8 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(mIntent);
                     }
                 case "updateLocation":
-                    float longitude = intent.getFloatExtra("longitude", 0);
-                    float latitude = intent.getFloatExtra("latitude", 0);
+                    double longitude = intent.getDoubleExtra("longitude", 0);
+                    double latitude = intent.getDoubleExtra("latitude", 0);
                     webView.loadUrl("javascript:updateLocation(" + longitude + ", " + latitude + ")");
                     break;
                 default:
@@ -208,9 +208,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void manageToolbar(){
-        Button button = findViewById(R.id.buttonShowMore);
-        button.setOnClickListener(l -> {
+        Button buttonShowMore = findViewById(R.id.buttonShowMore);
+        buttonShowMore.setOnClickListener(l -> {
             loadFile();
+        });
+        Button buttonClear = findViewById(R.id.buttonClear);
+        buttonClear.setOnClickListener(l -> {
+            clearItinerary();
         });
     }
 
@@ -227,6 +231,10 @@ public class MainActivity extends AppCompatActivity {
         // If there is no known position, we center the map on Paris
         latitude = userPrefs.getFloat("lastKnownLatitude",DEFAULT_LATITUDE);
         longitude = userPrefs.getFloat("lastKnownLongitude",DEFAULT_LONGITUDE);
+    }
+
+    private void clearItinerary(){
+        webView.loadUrl("javascript:clearItinerary()");
     }
 
     private void calcDistance(float destLongitude, float destLatitude){
