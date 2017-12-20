@@ -34,11 +34,13 @@ public class JavascriptConnection {
     }
 
     @JavascriptInterface
-    public void calcDistance(float longitude, float latitude){
-        Intent intent = new Intent("calcDistance");
+    public void addLawyer(double longitude, double latitude){
+        Intent intent = new Intent("addLawyer");
         intent.putExtra("longitude", longitude);
         intent.putExtra("latitude", latitude);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
+
+
 
 }

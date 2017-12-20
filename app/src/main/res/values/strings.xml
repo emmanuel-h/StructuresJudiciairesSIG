@@ -11,4 +11,10 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+
+    <string-array name="professions">
+        <item>Lawyer</item>
+        <item>Bailiff</item>
+        <item>Notary</item>
+    </string-array>
 </resources>

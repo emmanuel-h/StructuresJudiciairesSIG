@@ -31,6 +31,7 @@
             android:configChanges="orientation|screenSize" />
 
         <activity android:name=".view.WebViewActivity" />
+        <activity android:name=".view.AddLawyerActivity"></activity>
     </application>
 
 </manifest>

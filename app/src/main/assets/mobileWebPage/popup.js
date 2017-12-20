@@ -5,9 +5,14 @@ var details = document.getElementById('popup-details');
 var buttons = document.getElementById('popup-buttons');
 var vectorLine;
 var itineraryLine;
+var addLawyer= false;
 
 function setPathToInternalStorage(path){
     pathToInternalStorage = path;
+}
+
+function setAddLawyer(value){
+    addLawyer = value;
 }
 
 var overlay = new ol.Overlay({
@@ -37,27 +42,37 @@ map.on('click', function(event){
         layerUrl = layer.getSource().getUrl();
         return feature;
     }, 125);
-    if(feature){
-        var properties = feature.getProperties();
-        var coord = feature.getGeometry().getCoordinates();
-        switch(layerUrl){
-            case pathToInternalStorage+"/annuaire_lieux_justice.json":
-            case pathToInternalStorage+"/annuaire_tgi.json":
-            case pathToInternalStorage+"/annuaire_ti.json":
-                annuaire(properties, coord);
-                break;
-            case pathToInternalStorage+"/liste-des-greffes.json":
-                listeGreffes(properties, coord);
-                break;
-            default:
-                content.innerHTML = '<h3>Could not retrieve data for this point</h3>';
-                break;
+    if(addLawyer){
+        coordProj = ol.proj.transform(coordinate, 'EPSG:3857', 'EPSG:4326');
+        content.innerHTML = '<h3>Adding a lawyer</h3>';
+        buttons.innerHTML = '<button type="button" id="buttonAddLawyer">Add a lawyer</button>';
+        document.getElementById('buttonAddLawyer').onclick = function(){
+            JSInterface.addLawyer(+coordProj[0], +coordProj[1]);
         }
-        overlay.setPosition(coord);
+        overlay.setPosition(coordinate);
     }else{
-        details.innerHTML = "";
-        overlay.setPosition(undefined);
-        map.removeLayer(vectorLine);
+        if(feature){
+            var properties = feature.getProperties();
+            var coord = feature.getGeometry().getCoordinates();
+            switch(layerUrl){
+                case pathToInternalStorage+"/annuaire_lieux_justice.json":
+                case pathToInternalStorage+"/annuaire_tgi.json":
+                case pathToInternalStorage+"/annuaire_ti.json":
+                    annuaire(properties, coord);
+                    break;
+                case pathToInternalStorage+"/liste-des-greffes.json":
+                    listeGreffes(properties, coord);
+                    break;
+                default:
+                    content.innerHTML = '<h3>Could not retrieve data for this point</h3>';
+                    break;
+            }
+            overlay.setPosition(coord);
+        }else{
+                details.innerHTML = "";
+                overlay.setPosition(undefined);
+                map.removeLayer(vectorLine);
+            }
     }
 
     function annuaire(properties, coord){
@@ -177,7 +192,7 @@ map.on('click', function(event){
                 style:new ol.style.Style({
                     stroke:new ol.style.Stroke({
                         color:'#7300e6',
-                        width:3
+                        width:5
                     })
                 }),
                 zIndex:5

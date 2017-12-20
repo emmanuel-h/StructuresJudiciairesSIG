@@ -26,5 +26,8 @@
         android:checkable="true"
         android:checked="false"
         android:title="Personnes" />
+    <item
+        android:id="@+id/clearItinerary"
+        android:title="Clear itinerary" />
 </menu>
 

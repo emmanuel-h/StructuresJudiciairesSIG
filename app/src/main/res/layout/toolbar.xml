@@ -17,11 +17,11 @@
         android:visibility="visible" />
 
     <android.support.v7.widget.AppCompatButton
-        android:id="@+id/buttonClear"
+        android:id="@+id/buttonAddLawyer"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_marginLeft="16dp"
-        android:background="@android:drawable/ic_menu_close_clear_cancel"
+        android:background="@android:drawable/ic_input_add"
         android:backgroundTint="@android:color/white"
         android:visibility="visible" />
 
