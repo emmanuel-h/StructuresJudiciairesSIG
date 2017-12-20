@@ -1,7 +1,8 @@
 # StructuresJudiciairesSIG
 
 <h2>To deploy the server</h2>
-1. Create a directory to put the script coolScript and the FWTools installation from 2.b. It will also serve to store temporary files.
+1. Create a directory to put the script coolScript and the FWTools installation from 2.a. It will also serve to store temporary files.
+<br>
 2. Install following the librairies :
 	a. FWTools (the jar is in the project root directory :
 		tar xzvf FWTools-linux-2.0.6.tar.gz
@@ -14,6 +15,7 @@
 		git clone https://github.com/mbloch/mapshaper
 		cd mapshaper
 		npm install
+<br>
 3. Modify the script entry (at the top of the file) to match your own configuration :
 	a. The three paths (to your tomcat, mapshaper and the directory to store files)
 	b. The database informations (host, user, password and database name)
