@@ -51,4 +51,4 @@ freeline/
 freeline_project_description.json
 
 # Properties files
-server.properties
+*/server.properties

@@ -29,6 +29,9 @@ import com.sig.galherret.structuresjudiciairessig.model.JavascriptConnection;
 
 import org.apache.commons.io.IOUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -58,8 +61,20 @@ public class MainActivity extends AppCompatActivity {
                 case "download":
                     if(status) {
                         Toast.makeText(MainActivity.this,"Update complete",Toast.LENGTH_LONG).show();
+                        String[] files = fileList();
+                        for(String file : files){
+                            FileInputStream f = null;
+                            try {
+                                f = openFileInput(file);
+                                System.out.println("ICI : "+file+" "+f.getChannel().size());
+                            } catch (FileNotFoundException e) {
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
                     } else {
-                        Toast.makeText(MainActivity.this,"Update not worked",Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this,"Update did not work",Toast.LENGTH_LONG).show();
                     }
                     loadFile();
                     break;
@@ -170,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Launch the download async task
         final DownloadFile downloadFile = new DownloadFile(MainActivity.this, mProgressDialog);
-        try {
+        try {/*
             downloadFile.execute("http://"+getServerProperties("IPAddress")+":8080/geojson/"+files[0],
                     "http://"+getServerProperties("IPAddress")+":8080/geojson/"+files[1],
                     "http://"+getServerProperties("IPAddress")+":8080/geojson/"+files[2],
@@ -178,7 +193,9 @@ public class MainActivity extends AppCompatActivity {
                     files[0],
                     files[1],
                     files[2],
-                    files[3]);
+                    files[3]);*/
+            downloadFile.execute("http://"+getServerProperties("IPAddress")+":8888",
+                    "test.json");
         } catch (IOException e) {
             e.printStackTrace();
         }
