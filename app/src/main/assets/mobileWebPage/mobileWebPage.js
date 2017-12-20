@@ -1,6 +1,10 @@
 var map;
 var longitude;
 var latitude;
+var vectorLayerTi;
+var vectorLayerTgi;
+var vectorLayerListeGreffes;
+var vectorLayerLieuxJustice;
 
 var pathToInternalStorage;
 
@@ -13,12 +17,31 @@ function clearItinerary(){
     map.removeLayer(itineraryLine);
 }
 
+function dispLayer(layer, display){
+    switch(layer){
+        case "vectorLayerTi":
+            vectorLayerTi.setVisible(display);
+            break;
+        case "vectorLayerTgi":
+            vectorLayerTgi.setVisible(display);
+            break;
+        case "vectorLayerListeGreffes":
+            vectorLayerListeGreffes.setVisible(display);
+            break;
+        case "vectorLayerLieuxJustice":
+            vectorLayerLieuxJustice.setVisible(display);
+            break;
+        default:
+            break;
+    }
+}
+
 function afficherMap(longitude, latitude, path_to_internal_storage){
   pathToInternalStorage = 'http://172.20.10.4:8080/structuresJudiciaires';
-  var vectorLayerTi = createLayer(path_to_internal_storage+'/annuaire_ti.json','#ff0000',3,0.1,2500);
-  var vectorLayerTgi = createLayer(path_to_internal_storage+'/annuaire_tgi.json','#00ff00',4,0.1,5000);
-  var vectorLayerListeGreffes = createLayer(path_to_internal_storage+'/liste-des-greffes.json','#0000ff',2,0.1,3000);
-  var vectorLayerLieuxJustice = createLayer(path_to_internal_storage+'/annuaire_lieux_justice.json','#ffff00',1,0.1,500);
+  vectorLayerTi = createLayer(path_to_internal_storage+'/annuaire_ti.json','#ff0000',3,0.1,2500);
+  vectorLayerTgi = createLayer(path_to_internal_storage+'/annuaire_tgi.json','#00ff00',4,0.1,5000);
+  vectorLayerListeGreffes = createLayer(path_to_internal_storage+'/liste-des-greffes.json','#0000ff',2,0.1,3000);
+  vectorLayerLieuxJustice = createLayer(path_to_internal_storage+'/annuaire_lieux_justice.json','#ffff00',1,0.1,500);
 
   pathToInternalStorage = path_to_internal_storage;
 

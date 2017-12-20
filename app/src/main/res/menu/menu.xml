@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/greffe"
+        android:checkable="true"
+        android:checked="true"
+        android:title="Greffes" />
+    <item
+        android:id="@+id/tgi"
+        android:checkable="true"
+        android:checked="true"
+        android:title="TGI" />
+    <item
+        android:id="@+id/ti"
+        android:checkable="true"
+        android:checked="true"
+        android:title="TI" />
+    <item
+        android:id="@+id/lieuxJustice"
+        android:checkable="true"
+        android:checked="true"
+        android:title="Lieux justice" />
+    <item
+        android:id="@+id/personnes"
+        android:checkable="true"
+        android:checked="false"
+        android:title="Personnes" />
+</menu>
+

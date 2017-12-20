@@ -8,20 +8,21 @@
     android:layout_height="wrap_content">
 
     <android.support.v7.widget.AppCompatButton
-        android:id="@+id/buttonShowMore"
+        android:id="@+id/buttonRefresh"
         android:layout_width="32dp"
         android:layout_height="32dp"
+        android:layout_marginLeft="64dp"
         android:background="@drawable/refresh_icon"
-        android:backgroundTint="@android:color/background_light"
+        android:backgroundTint="@android:color/white"
         android:visibility="visible" />
 
     <android.support.v7.widget.AppCompatButton
         android:id="@+id/buttonClear"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:layout_marginLeft="32dp"
+        android:layout_marginLeft="16dp"
         android:background="@android:drawable/ic_menu_close_clear_cancel"
-        android:backgroundTint="@android:color/background_light"
+        android:backgroundTint="@android:color/white"
         android:visibility="visible" />
 
 </android.support.v7.widget.Toolbar>

@@ -15,10 +15,13 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.sig.galherret.structuresjudiciairessig.R;
 import com.sig.galherret.structuresjudiciairessig.model.GPSService;
@@ -30,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import static android.content.pm.PackageManager.PERMISSION_DENIED;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
@@ -207,15 +211,52 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case R.id.greffe:
+                dispLayer(item, "vectorLayerListeGreffes");
+                return true;
+            case R.id.tgi:
+                dispLayer(item, "vectorLayerTgi");
+                return true;
+            case R.id.ti:
+                dispLayer(item, "vectorLayerTi");
+                return true;
+            case R.id.lieuxJustice:
+                dispLayer(item, "vectorLayerLieuxJustice");
+                return true;
+            case R.id.personnes:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private void dispLayer(MenuItem item, String layerName){
+        if(item.isChecked()){
+            Logger.getAnonymousLogger().severe("layer name : " + layerName);
+            webView.loadUrl("javascript:dispLayer('"+ layerName +"', " + false + ")");
+            item.setChecked(false);
+        }else{
+            webView.loadUrl("javascript:dispLayer('"+ layerName +"', " + true + ")");
+            item.setChecked(true);
+        }
+    }
+
     private void manageToolbar(){
-        Button buttonShowMore = findViewById(R.id.buttonShowMore);
-        buttonShowMore.setOnClickListener(l -> {
-            loadFile();
-        });
+        android.support.v7.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        Button buttonShowMore = findViewById(R.id.buttonRefresh);
+        buttonShowMore.setOnClickListener(l -> loadFile());
         Button buttonClear = findViewById(R.id.buttonClear);
-        buttonClear.setOnClickListener(l -> {
-            clearItinerary();
-        });
+        buttonClear.setOnClickListener(l -> clearItinerary());
     }
 
     private String getServerProperties(String key) throws IOException {

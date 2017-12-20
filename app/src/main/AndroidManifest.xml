@@ -30,7 +30,7 @@
             android:name=".model.GPSService"
             android:configChanges="orientation|screenSize" />
 
-        <activity android:name=".view.WebViewActivity"></activity>
+        <activity android:name=".view.WebViewActivity" />
     </application>
 
 </manifest>
