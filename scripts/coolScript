@@ -1,23 +1,23 @@
 #!/bin/bash
 # Paths to the differents applications on the server machines
 tomcat_path="/home/emmanuelh/Softwares/apache-tomcat-9.0.0.M26"
-postgis2shp_path="/home/emmanuelh/Documents/serverPython"
+directory_path="/home/emmanuelh/Documents/serverPython"
 mapshaper_path="/home/emmanuelh/Git/mapshaper"
+#Database informations
+host="localhost"
+user="postgres"
+password="postgres"
+database="StructureJudiciaire"
 
 # Commands to stop or start the apache tomcat server according to the paths
 stop_tomcat="sh $tomcat_path/bin/shutdown.sh"
 launch_tomcat="sh $tomcat_path/bin/startup.sh"
 
 # final files
-file1KO="annuaire_lieux_justice_2154.json"
-file2KO="annuaire_tgi_2154.json"
-file3KO="annuaire_ti_2154.json"
-file4KO="liste_des_greffes_2154.json"
-file1OK="annuaire_lieux_justice.json"
-file2OK="annuaire_tgi.json"
-file3OK="annuaire_ti.json"
-file4OK="liste_des_greffes.json"
-
+LieuxJustice="annuaire_lieux_justice"
+TGI="annuaire_tgi"
+TI="annuaire_ti"
+Greffes="liste_des_greffes"
 
 # Infinite loop to allow the user to enter differents commands
 while true
@@ -30,25 +30,20 @@ do
     # Set the envoronment path variable
     PATH=$PATH:$HOME/FWTools/bin_safe
     # Export the database infos into shapefiles
-    eval "python $postgis2shp_path/postgis2shp.py"
+    for file in $LieuxJustice $TGI $TI $Greffes
+    do
+      pgsql2shp -f "$HOME/Documents/serverPython/$file" -h $host -u $user -P $password $database "SELECT * FROM $file"
+    done
     # Export shapefiles into geojson
-    eval "$mapshaper_path/bin/mapshaper $postgis2shp_path/*.shp -o $postgis2shp_path/ format=geojson"
+    eval "$mapshaper_path/bin/mapshaper $directory_path/*.shp -o $directory_path/ format=geojson"
     # Remove temporary files
-    rm *.shp
-    rm *.shx
-    rm *.prj
-    rm *.dbf
-    find $postgis2shp_path -maxdepth 1 -type f -not -name '*2154*' -name '*.json' -delete
-    mv $file1KO $file1OK
-    mv $file2KO $file2OK
-    mv $file3KO $file3OK
-    mv $file4KO $file4OK
+    rm *.shp *.shx *.prj *.dbf *.cpg
     # Move the geojson files to the server
-    eval "cp $file1OK $tomcat_path/webapps/geojson/"
-    eval "cp $file2OK $tomcat_path/webapps/geojson/"
-    eval "cp $file3OK $tomcat_path/webapps/geojson/"
-    eval "cp $file4OK $tomcat_path/webapps/geojson/"
-    ;;
+    for file in $LieuxJustice $TGI $TI $Greffes
+    do
+      eval "cp $file.json $tomcat_path/webapps/geojson/"
+    done
+  ;;
 
     "stop" ) eval $stop_tomcat
     exit;;
