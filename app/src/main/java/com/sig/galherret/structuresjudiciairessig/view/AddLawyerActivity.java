@@ -29,6 +29,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 public class AddLawyerActivity extends AppCompatActivity {
 
@@ -44,51 +45,37 @@ public class AddLawyerActivity extends AppCompatActivity {
         spinner.setAdapter(adapter);
 
         Button buttonAdd = findViewById(R.id.buttonAdd);
-        buttonAdd.setOnClickListener(l -> createFile());
+        buttonAdd.setOnClickListener(l -> sendData());
     }
 
-    private void createFile(){
+    private void sendData(){
         double longitude = getIntent().getDoubleExtra("longitude", 0);
         double latitude = getIntent().getDoubleExtra("latitude", 0);
         EditText nameText = findViewById(R.id.name);
         String name = nameText.getText().toString();
+        name = name.replaceAll("&", "");
         EditText forenameText = findViewById(R.id.forename);
         String forename = forenameText.getText().toString();
+        forename = forename.replaceAll("&", "");
         EditText addressText = findViewById(R.id.address);
         String address = addressText.getText().toString();
+        address = address.replaceAll("&", "");
         EditText phoneText = findViewById(R.id.phoneNumber);
         String phoneNumber = phoneText.getText().toString();
+        phoneNumber = phoneNumber.replaceAll("&", "");
         Spinner spinner = findViewById(R.id.profession);
         String profession = spinner.getSelectedItem().toString();
-        try {
-            FileOutputStream fos = openFileOutput("newLawyer", Context.MODE_APPEND);
-            OutputStreamWriter osw = new OutputStreamWriter(fos);
-            osw.write("name:" + name + ","
-                    + "forename:" + forename + ","
-                    + "address:" + address + ","
-                    + "phone:" + phoneNumber + ","
-                    + "profession:" + profession);
-            osw.close();
-            fos.close();
-            sendFile("newLawyer");
-        } catch (IOException e) {
-            Toast.makeText(this, "Cannot add a lawyer", Toast.LENGTH_LONG).show();
-        }
-    }
 
-    private void sendFile(String file) throws IOException {
-        String serverAddress = "http://" + getServerProperties("IPAddress") + ":8080/geojson/";
-        Intent intent = new Intent("sendFile");
-        intent.putExtra("server", serverAddress);
-        intent.putExtra("fileName", file);
+        Intent intent = new Intent("sendData");
+        intent.putExtra("name", name);
+        intent.putExtra("forename", forename);
+        intent.putExtra("address", address);
+        intent.putExtra("phoneNumber", phoneNumber);
+        intent.putExtra("profession", profession);
+        intent.putExtra("longitude", longitude);
+        intent.putExtra("latitude", latitude);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-    }
 
-    private String getServerProperties(String key) throws IOException {
-        Properties properties = new Properties();
-        AssetManager assetManager = getAssets();
-        InputStream inputStream = assetManager.open("server.properties");
-        properties.load(inputStream);
-        return properties.getProperty(key);
+        super.finish();
     }
 }
