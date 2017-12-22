@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private float latitude;
     private final float DEFAULT_LATITUDE = 48.859489f;
     private final float DEFAULT_LONGITUDE = 2.320582f;
-    private final String[] files = {"annuaire_ti.json", "annuaire_tgi.json", "annuaire_lieux_justice.json", "liste_des_greffes.json"};
+    private final String[] files = {"annuaire_ti.json", "annuaire_tgi.json", "annuaire_lieux_justice.json", "liste_des_greffes.json", "personne.json"};
     private String PATH_TO_INTERNAL_STORAGE;
     private boolean addLawyer = false;
 
@@ -221,10 +221,12 @@ public class MainActivity extends AppCompatActivity {
                     "http://" + getServerProperties("IPAddress") + ":8080/geojson/" + files[1],
                     "http://" + getServerProperties("IPAddress") + ":8080/geojson/" + files[2],
                     "http://" + getServerProperties("IPAddress") + ":8080/geojson/" + files[3],
+                    "http://" + getServerProperties("IPAddress") + ":8080/geojson/" + files[4],
                     files[0],
                     files[1],
                     files[2],
-                    files[3]);
+                    files[3],
+                    files[4]);
         } catch (IOException e) {
             e.printStackTrace();
         }

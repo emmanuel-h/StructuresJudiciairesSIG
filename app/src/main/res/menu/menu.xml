@@ -24,7 +24,7 @@
     <item
         android:id="@+id/personnes"
         android:checkable="true"
-        android:checked="false"
+        android:checked="true"
         android:title="Personnes" />
     <item
         android:id="@+id/clearItinerary"

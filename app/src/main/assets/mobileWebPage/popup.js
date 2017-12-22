@@ -22,9 +22,9 @@ function setAddLawyer(value){
 function sendDataToServer(serverAddress, serverPort, longitude, latitude, name, forename, address, phone, profession){
     var xhttp = new XMLHttpRequest();
     xhttp.open("POST", "http://" + serverAddress + ":" + serverPort, true);
-    xhttp.send("&longitude=" + longitude + "&latitude=" + latitude + "&nom=" + name
-            + "&prenom=" + forename + "&adresse=" + address + "&telephone=" + phone
-            + "&profession=" + profession);
+    xhttp.send("&" + longitude + "&" + latitude + "&" + name
+            + "&" + forename + "&" + address + "&" + phone
+            + "&" + profession);
     overlay.setPosition(undefined);
     closer.blur();
 }
@@ -55,7 +55,7 @@ map.on('click', function(event){
     var feature = map.forEachFeatureAtPixel(event.pixel, function(feature, layer){
         layerUrl = layer.getSource().getUrl();
         return feature;
-    }, 125);
+    }, {hitTolerance:10});
     if(addLawyer){
         coordProj = ol.proj.transform(coordinate, 'EPSG:3857', 'EPSG:4326');
         content.innerHTML = '<h3>Adding a lawyer</h3>';
@@ -80,6 +80,7 @@ map.on('click', function(event){
                     break;
                 case pathToInternalStorage+"/personne.json":
                     personne(properties, coord);
+                    break;
                 default:
                     content.innerHTML = '<h3>Could not retrieve data for this point</h3>';
                     break;
