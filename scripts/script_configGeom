@@ -6,3 +6,26 @@ update public.annuaire_lieux_justice set geom=ST_SetSRID(ST_MakePoint(cast(longi
 update public.annuaire_tgi set geom=ST_SetSRID(ST_MakePoint(cast(longitude as numeric),cast(latitude as numeric)),2154) ::geometry;
 update public.annuaire_ti set geom=ST_SetSRID(ST_MakePoint(cast(longitude as numeric),cast(latitude as numeric)),2154) ::geometry;
 update public."liste-des-greffes" set geom=ST_SetSRID(ST_MakePoint(cast(longitude as numeric),cast(latitude as numeric)),2154) ::geometry;
+
+-- Table: public.personne
+
+DROP TABLE public.personne;
+
+CREATE TABLE public.personne
+(
+  idPersonne serial primary key,
+  longitude character varying(256),
+  latitude character varying(256),
+  nom character varying(256),
+  prenom character varying(256),
+  adresse character varying(256),
+  telephone character varying(44),
+  profession character varying(256),
+  geom geometry
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.personne
+  OWNER TO postgres;
+
