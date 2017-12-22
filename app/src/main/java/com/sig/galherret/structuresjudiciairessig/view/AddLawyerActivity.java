@@ -38,6 +38,7 @@ public class AddLawyerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_lawyer);
 
+        // Initializing spinner's datas from an array in strings.xml
         Spinner spinner = findViewById(R.id.profession);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
                 this, R.array.professions, android.R.layout.simple_spinner_item);
@@ -48,21 +49,36 @@ public class AddLawyerActivity extends AppCompatActivity {
         buttonAdd.setOnClickListener(l -> sendData());
     }
 
+    /**
+     * Function to pass datas about the new lawyer from AddLawyerActivity to MainActivity to be sent
+     * afterward to the server
+     *
+     * Retrieves last known longitude and latitude of the user from intent
+     * Retrieves lawyer's informations from the form
+     * Deletes all the '&' char since it's used as a separator by the server to handle datas that it receives
+     * Sending datas to the main activity through the BroadcastReceiver
+     * Ends the activity
+     */
     private void sendData(){
         double longitude = getIntent().getDoubleExtra("longitude", 0);
         double latitude = getIntent().getDoubleExtra("latitude", 0);
+
         EditText nameText = findViewById(R.id.name);
         String name = nameText.getText().toString();
         name = name.replaceAll("&", "");
+
         EditText forenameText = findViewById(R.id.forename);
         String forename = forenameText.getText().toString();
         forename = forename.replaceAll("&", "");
+
         EditText addressText = findViewById(R.id.address);
         String address = addressText.getText().toString();
         address = address.replaceAll("&", "");
+
         EditText phoneText = findViewById(R.id.phoneNumber);
         String phoneNumber = phoneText.getText().toString();
         phoneNumber = phoneNumber.replaceAll("&", "");
+
         Spinner spinner = findViewById(R.id.profession);
         String profession = spinner.getSelectedItem().toString();
 
