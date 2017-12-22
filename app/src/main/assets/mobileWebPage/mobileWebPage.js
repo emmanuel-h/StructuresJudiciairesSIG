@@ -1,27 +1,34 @@
+//the map of OpenLayers
 var map;
+//the longitude and the latitude of th user
 var longitude;
 var latitude;
+//the different layers
 var vectorLayerTi;
 var vectorLayerTgi;
 var vectorLayerListeGreffes;
 var vectorLayerLieuxJustice;
 var vectorLayerPersonne;
-
+//the path to access to the different GeoJSON
 var pathToInternalStorage;
 
+//update the location
 function updateLocation(long, lat){
     longitude = long;
     latitude = lat;
 }
 
+//center the map on the current position of the user
 function centerMap(){
    map.getView().setCenter(ol.proj.transform([+longitude, +latitude], 'EPSG:4326', 'EPSG:3857'));
 }
 
+//clear the current itinerary
 function clearItinerary(){
     map.removeLayer(itineraryLine);
 }
 
+//display or undisplay the selected layer
 function dispLayer(layer, display){
     switch(layer){
         case "vectorLayerTi":
@@ -43,8 +50,10 @@ function dispLayer(layer, display){
     }
 }
 
+//global function which create the map with layers
 function afficherMap(longitude, latitude, path_to_internal_storage){
   //pathToInternalStorage = 'http://172.20.10.4:8080/structuresJudiciaires';
+  //create the 5 layers with their GeoJSON file and different properties
   vectorLayerTi = createLayer(path_to_internal_storage+'/annuaire_ti.json','#ff0000',3,0.1,2500);
   vectorLayerTgi = createLayer(path_to_internal_storage+'/annuaire_tgi.json','#00ff00',4,0.1,5000);
   vectorLayerListeGreffes = createLayer(path_to_internal_storage+'/liste_des_greffes.json','#0000ff',2,0.1,3000);
@@ -52,7 +61,7 @@ function afficherMap(longitude, latitude, path_to_internal_storage){
   vectorLayerPersonne = createLayer(path_to_internal_storage+'/personne.json','#00ffff',1,0.1,500);
   pathToInternalStorage = path_to_internal_storage;
 
-//création de la map avec OSM et les differents layers
+//create the OSM map and layers
   map = new ol.Map({
       layers: [
         new ol.layer.Tile({
@@ -69,20 +78,20 @@ function afficherMap(longitude, latitude, path_to_internal_storage){
   });
 
 
-//catch de l'event de mouvement de la map et application de la fonction de changement de style des layers
+//catch the move event and change the style of layers
 map.on('moveend',changeStyle);
 
-//fonction pour changer le style des layers en fonction du niveau de zoom
+//change the style of layers depending on the zoom level
 function changeStyle(){
   var newZoom = map.getView().getZoom();
   newZoom > 10 ? vectorLayerTgi.setStyle(styleFunction("#00ff00",12)) : vectorLayerTgi.setStyle(styleFunction('#00ff00',5)) ;
   newZoom > 12 ? vectorLayerTi.setStyle(styleFunction("#ff0000",8)) : vectorLayerTi.setStyle(styleFunction('#ff0000',5)) ;
   newZoom > 10 ? vectorLayerListeGreffes.setStyle(styleFunction("#0000ff",12)) : vectorLayerListeGreffes.setStyle(styleFunction('#0000ff',5)) ;
   newZoom > 12 ? vectorLayerLieuxJustice.setStyle(styleFunction("#ffff00",8)) : vectorLayerLieuxJustice.setStyle(styleFunction('#ffff00',5)) ;
-   newZoom > 12 ? vectorLayerPersonne.setStyle(styleFunction("#00ffff",8)) : vectorLayerPersonne.setStyle(styleFunction('#00ffff',5)) ;
+  newZoom > 12 ? vectorLayerPersonne.setStyle(styleFunction("#00ffff",8)) : vectorLayerPersonne.setStyle(styleFunction('#00ffff',5)) ;
 };
 
-//fonction pour recuperer un style de point avec une couleur et un rayon
+//return a style with a specific color and radius of circle
 function styleFunction(colorP,rad){
   var style = new ol.style.Style({
     image: new ol.style.Circle(({
@@ -95,7 +104,7 @@ function styleFunction(colorP,rad){
   return style;
 }
 
-//fonction pour creer les layers en fonction du fichier, de la couleur des points, du positionnement en Z et l'intervalle d'affichage(min/max)
+//return a layer with a file path, color of point, index of display, min/max definiton to display
 function createLayer(file,colorPoint,index,minR,maxR){
   var vectorLayer = new ol.layer.Vector({
     source: new ol.source.Vector({

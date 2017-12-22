@@ -7,7 +7,6 @@ import android.webkit.WebViewClient;
 
 import com.sig.galherret.structuresjudiciairessig.R;
 
-import java.util.logging.Logger;
 
 public class WebViewActivity extends AppCompatActivity {
 
