@@ -42,4 +42,4 @@
 </li>
 </ul>
 <h2>Servers setup</h2>
-To launch the tomcat and refresh the json with
+To launch the tomcat and refresh the json with the latest data, run coolScript with ./coolScript. To run the python server listening to the Personne update, run python server.py. The changes received will only be generated as JSon file when you write <em>reload</em> in the coolScript terminal. It allows you to verify the data.
