@@ -20,31 +20,37 @@ TI="annuaire_ti"
 Greffes="liste_des_greffes"
 Personnes="personne"
 
+reload(){
+  # Set the envoronment path variable
+  PATH=$PATH:$HOME/FWTools/bin_safe
+  # Export the database infos into shapefiles
+  for file in $LieuxJustice $TGI $TI $Greffes $Personnes
+  do
+    pgsql2shp -f "$HOME/Documents/serverPython/$file" -h $host -u $user -P $password $database "SELECT * FROM $file"
+  done
+  # Export shapefiles into geojson
+  eval "$mapshaper_path/bin/mapshaper $directory_path/*.shp -o $directory_path/ format=geojson"
+  # Remove temporary files
+  rm *.shp *.shx *.prj *.dbf *.cpg
+  # Move the geojson files to the server
+  for file in $LieuxJustice $TGI $TI $Greffes $Personnes
+  do
+    eval "cp $file.json $tomcat_path/webapps/geojson/"
+  done
+}
+
 # Infinite loop to allow the user to enter differents commands
 while true
 do
-  read -p "start - stop `echo $'\n> '`" answer
+  read -p "start - stop - reload `echo $'\n> '`" answer
 
   # (2) handle the input we were given
   case $answer in
     "start" ) eval $launch_tomcat
-    # Set the envoronment path variable
-    PATH=$PATH:$HOME/FWTools/bin_safe
-    # Export the database infos into shapefiles
-    for file in $LieuxJustice $TGI $TI $Greffes $Personnes
-    do
-      pgsql2shp -f "$directory_path/$file" -h $host -u $user -P $password $database "SELECT * FROM $file"
-    done
-    # Export shapefiles into geojson
-    eval "$mapshaper_path/bin/mapshaper $directory_path/*.shp -o $directory_path/ format=geojson"
-    # Remove temporary files
-    rm *.shp *.shx *.prj *.dbf *.cpg
-    # Move the geojson files to the server
-    for file in $LieuxJustice $TGI $TI $Greffes $Personnes
-    do
-      eval "cp $file.json $tomcat_path/webapps/geojson/"
-    done
-  ;;
+              reload
+    ;;
+    "reload" ) reload
+    ;;
 
     "stop" ) eval $stop_tomcat
     exit;;
