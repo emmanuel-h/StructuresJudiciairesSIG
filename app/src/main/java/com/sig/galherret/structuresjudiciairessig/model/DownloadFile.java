@@ -22,7 +22,7 @@ public class DownloadFile extends AsyncTask<String, Integer, String> {
     // Declaration of the progress dialog to be able to communicate with the UI inside the AsyncTask class
     private ProgressDialog mProgressDialog;
 
-    DownloadFile(Context context, ProgressDialog _mProgressDialog) {
+    public DownloadFile(Context context, ProgressDialog _mProgressDialog) {
         this.context = context;
         this.mProgressDialog = _mProgressDialog;
     }
