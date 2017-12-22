@@ -32,7 +32,7 @@ do
     # Export the database infos into shapefiles
     for file in $LieuxJustice $TGI $TI $Greffes
     do
-      pgsql2shp -f "$HOME/Documents/serverPython/$file" -h $host -u $user -P $password $database "SELECT * FROM $file"
+      pgsql2shp -f "$directory_path/$file" -h $host -u $user -P $password $database "SELECT * FROM $file"
     done
     # Export shapefiles into geojson
     eval "$mapshaper_path/bin/mapshaper $directory_path/*.shp -o $directory_path/ format=geojson"
