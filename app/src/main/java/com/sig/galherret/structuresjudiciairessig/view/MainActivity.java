@@ -21,7 +21,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import com.sig.galherret.structuresjudiciairessig.R;
 import com.sig.galherret.structuresjudiciairessig.model.GPSService;
@@ -29,14 +28,10 @@ import com.sig.galherret.structuresjudiciairessig.model.JavascriptConnection;
 
 import org.apache.commons.io.IOUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 import static android.content.pm.PackageManager.PERMISSION_DENIED;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
@@ -63,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
                     if (status) {
                         Toast.makeText(MainActivity.this, "Update complete", Toast.LENGTH_LONG).show();
                     } else {
-                        Toast.makeText(MainActivity.this, "Update not worked", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, "Update did not work", Toast.LENGTH_LONG).show();
                     }
                     loadFile();
                     break;
@@ -103,19 +98,27 @@ public class MainActivity extends AppCompatActivity {
                     double longitudeLawyer = intent.getDoubleExtra("longitude", 0);
                     double latitudeLawyer = intent.getDoubleExtra("latitude", 0);
                     Intent mIntent = new Intent(MainActivity.this, AddLawyerActivity.class);
+                    mIntent.putExtra("longitude", longitudeLawyer);
+                    mIntent.putExtra("latitude", latitudeLawyer);
                     startActivity(mIntent);
                     break;
-                case "sendFile":
-                    String server = intent.getStringExtra("server");
-                    String fileName = intent.getStringExtra("fileName");
-                    ProgressDialog mProgressDialog;
-                    mProgressDialog = new ProgressDialog(MainActivity.this);
-                    mProgressDialog.setMessage("Update informations from the server");
-                    //mProgressDialog.setIndeterminate(true);
-                    mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                    mProgressDialog.setCancelable(false);
-                    UploadFile upload = new UploadFile(MainActivity.this, mProgressDialog);
-                    upload.execute(server, fileName);
+                case "sendData":
+                    String name = intent.getStringExtra("name");
+                    String forename = intent.getStringExtra("forename");
+                    String address = intent.getStringExtra("address");
+                    String phoneNumber2 = intent.getStringExtra("phoneNumber");
+                    String profession = intent.getStringExtra("profession");
+                    double longitudeLawyer2 = intent.getDoubleExtra("longitude", 0);
+                    double latitudeLawyer2 = intent.getDoubleExtra("latitude", 0);
+                    try {
+                        webView.loadUrl("javascript:sendDataToServer('" + getServerProperties("IPAddress") + "','"
+                                + getServerProperties("PortAddress") + "'," + longitudeLawyer2 + "," + latitudeLawyer2
+                                + ",'" + name + "','" + forename + "','" + address
+                                + "','" + phoneNumber2 + "','" + profession + "')");
+                        addLawyer();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 default:
                     Toast.makeText(MainActivity.this, "Nothing received", Toast.LENGTH_LONG).show();
@@ -156,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
             LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                     new IntentFilter("addLawyer"));
             LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
-                    new IntentFilter("sendFile"));
+                    new IntentFilter("sendData"));
         }
     }
 
@@ -199,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
         // Instantiate the ProgressBar
         ProgressDialog mProgressDialog;
         mProgressDialog = new ProgressDialog(MainActivity.this);
-        mProgressDialog.setMessage("Update informations from the server");
+        mProgressDialog.setMessage("Updating informations from the server");
         //mProgressDialog.setIndeterminate(true);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         mProgressDialog.setCancelable(false);
@@ -280,7 +283,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void dispLayer(MenuItem item, String layerName) {
         if (item.isChecked()) {
-            Logger.getAnonymousLogger().severe("layer name : " + layerName);
             webView.loadUrl("javascript:dispLayer('" + layerName + "', " + false + ")");
             item.setChecked(false);
         } else {
