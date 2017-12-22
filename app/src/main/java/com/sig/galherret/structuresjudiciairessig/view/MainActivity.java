@@ -35,6 +35,7 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Properties;
 
+
 import static android.content.pm.PackageManager.PERMISSION_DENIED;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
@@ -278,6 +279,7 @@ public class MainActivity extends AppCompatActivity {
                 dispLayer(item, "vectorLayerLieuxJustice");
                 return true;
             case R.id.personnes:
+                dispLayer(item,"vectorLayerPersonne");
                 return true;
             case R.id.clearItinerary:
                 clearItinerary();
