@@ -305,8 +305,15 @@ public class MainActivity extends AppCompatActivity {
     private void manageToolbar() {
         android.support.v7.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        Button buttonShowMore = findViewById(R.id.buttonRefresh);
-        buttonShowMore.setOnClickListener(l -> loadFile());
+        Button buttonRefresh = findViewById(R.id.buttonRefresh);
+        buttonRefresh.setOnClickListener(l ->{
+            if(checkConnection()){
+                updateJson();
+                loadFile();
+            }else{
+                Toast.makeText(this,"Can't refresh your data, check your connectivity", Toast.LENGTH_LONG).show();
+            }
+        });
         Button buttonAdd = findViewById(R.id.buttonAddLawyer);
         buttonAdd.setOnClickListener(l -> addLawyer());
         Button buttonCenter = findViewById(R.id.buttonCenter);

@@ -54,7 +54,6 @@ public class DownloadFile extends AsyncTask<String, Integer, String> {
                 // download the file
                 input = connection.getInputStream();
                 //Toast.makeText(context,input.toString(),Toast.LENGTH_LONG).show();
-                System.out.println("ICIII");
                 output = context.openFileOutput(outputFile, Context.MODE_PRIVATE);
                 byte data[] = new byte[4096];
 
@@ -75,7 +74,6 @@ public class DownloadFile extends AsyncTask<String, Integer, String> {
                 }
             }
         } catch (Exception e) {
-            System.out.println("Erreur " + e.toString());
             return e.toString();
         } finally {
             try {
