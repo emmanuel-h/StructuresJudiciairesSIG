@@ -60,7 +60,7 @@ map.on('click', function(event){
                 case pathToInternalStorage+"/annuaire_ti.json":
                     annuaire(properties, coord);
                     break;
-                case pathToInternalStorage+"/liste-des-greffes.json":
+                case pathToInternalStorage+"/liste_des_greffes.json":
                     listeGreffes(properties, coord);
                     break;
                 default:
@@ -185,7 +185,7 @@ map.on('click', function(event){
                 geometry:new ol.geom.LineString(coordProj)
             });
             var sourceVector = new ol.source.Vector({
-                        features:[featureLine]
+                features:[featureLine]
             });
             itineraryLine = new ol.layer.Vector({
                 source:sourceVector,

@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private float latitude;
     private final float DEFAULT_LATITUDE = 48.859489f;
     private final float DEFAULT_LONGITUDE = 2.320582f;
-    private final String[] files = {"annuaire_ti.json", "annuaire_tgi.json", "annuaire_lieux_justice.json", "liste-des-greffes.json"};
+    private final String[] files = {"annuaire_ti.json", "annuaire_tgi.json", "annuaire_lieux_justice.json", "liste_des_greffes.json"};
     private String PATH_TO_INTERNAL_STORAGE;
     private boolean addLawyer = false;
 
@@ -66,6 +66,13 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(MainActivity.this, "Update not worked", Toast.LENGTH_LONG).show();
                     }
                     loadFile();
+                    break;
+                case "upload":
+                    if(status){
+                        Toast.makeText(MainActivity.this, "Upload complete", Toast.LENGTH_LONG).show();
+                    }else{
+                        Toast.makeText(MainActivity.this, "Upload failed", Toast.LENGTH_LONG).show();
+                    }
                     break;
                 case "loadWebsite":
                     String url = intent.getStringExtra("url");
@@ -86,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
                         mIntent.setData(Uri.parse("tel:" + phoneNumber));
                         startActivity(mIntent);
                     }
+                    break;
                 case "updateLocation":
                     double longitude = intent.getDoubleExtra("longitude", 0);
                     double latitude = intent.getDoubleExtra("latitude", 0);
@@ -96,6 +104,18 @@ public class MainActivity extends AppCompatActivity {
                     double latitudeLawyer = intent.getDoubleExtra("latitude", 0);
                     Intent mIntent = new Intent(MainActivity.this, AddLawyerActivity.class);
                     startActivity(mIntent);
+                    break;
+                case "sendFile":
+                    String server = intent.getStringExtra("server");
+                    String fileName = intent.getStringExtra("fileName");
+                    ProgressDialog mProgressDialog;
+                    mProgressDialog = new ProgressDialog(MainActivity.this);
+                    mProgressDialog.setMessage("Update informations from the server");
+                    //mProgressDialog.setIndeterminate(true);
+                    mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                    mProgressDialog.setCancelable(false);
+                    UploadFile upload = new UploadFile(MainActivity.this, mProgressDialog);
+                    upload.execute(server, fileName);
                     break;
                 default:
                     Toast.makeText(MainActivity.this, "Nothing received", Toast.LENGTH_LONG).show();
@@ -126,6 +146,8 @@ public class MainActivity extends AppCompatActivity {
             LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                     new IntentFilter("download"));
             LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+                    new IntentFilter("upload"));
+            LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                     new IntentFilter("loadWebsite"));
             LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                     new IntentFilter("makeCall"));
@@ -133,6 +155,8 @@ public class MainActivity extends AppCompatActivity {
                     new IntentFilter("updateLocation"));
             LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                     new IntentFilter("addLawyer"));
+            LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+                    new IntentFilter("sendFile"));
         }
     }
 
@@ -191,8 +215,6 @@ public class MainActivity extends AppCompatActivity {
                     files[1],
                     files[2],
                     files[3]);
-            downloadFile.execute("http://"+getServerProperties("IPAddress")+":8888",
-                    "test.json");
         } catch (IOException e) {
             e.printStackTrace();
         }

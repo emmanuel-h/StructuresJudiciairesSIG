@@ -1,8 +1,10 @@
 package com.sig.galherret.structuresjudiciairessig.view;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Environment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -17,10 +19,12 @@ import android.widget.Toast;
 import com.sig.galherret.structuresjudiciairessig.R;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -39,12 +43,8 @@ public class AddLawyerActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 
-        Button buttonAdd = findViewById(R.id.buttonAddLawyer);
-        buttonAdd.setOnClickListener(l -> addLawyer());
-    }
-
-    private void addLawyer(){
-
+        Button buttonAdd = findViewById(R.id.buttonAdd);
+        buttonAdd.setOnClickListener(l -> createFile());
     }
 
     private void createFile(){
@@ -70,20 +70,18 @@ public class AddLawyerActivity extends AppCompatActivity {
                     + "profession:" + profession);
             osw.close();
             fos.close();
+            sendFile("newLawyer");
         } catch (IOException e) {
             Toast.makeText(this, "Cannot add a lawyer", Toast.LENGTH_LONG).show();
         }
     }
 
-    private void sendFile() throws IOException {
-        String serverAddress = "http://" + getServerProperties("IPAddress") + ":8080";
-        File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "newLawyer");
-        URL url = new URL(serverAddress);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setConnectTimeout(2000);
-        connection.setRequestMethod("GET");
-        connection.setDoOutput(true);
-        connection.connect();
+    private void sendFile(String file) throws IOException {
+        String serverAddress = "http://" + getServerProperties("IPAddress") + ":8080/geojson/";
+        Intent intent = new Intent("sendFile");
+        intent.putExtra("server", serverAddress);
+        intent.putExtra("fileName", file);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     private String getServerProperties(String key) throws IOException {
