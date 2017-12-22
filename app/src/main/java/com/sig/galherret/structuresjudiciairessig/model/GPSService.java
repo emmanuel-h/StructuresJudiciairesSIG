@@ -47,6 +47,9 @@ public class GPSService extends Service implements LocationListener {
         }
     }
 
+    /**
+     * Start the listening for the user's localisation
+     */
     private void launchListening() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -98,6 +101,10 @@ public class GPSService extends Service implements LocationListener {
     public void onStatusChanged(String provider, int status, Bundle extras) {
     }
 
+    /**
+     * Save the current location on the SharedPreferences
+     * @param location
+     */
     private void saveCoordinates(Location location){
         SharedPreferences coordinates = getSharedPreferences("coordinates",MODE_PRIVATE);
         SharedPreferences.Editor editor = coordinates.edit();

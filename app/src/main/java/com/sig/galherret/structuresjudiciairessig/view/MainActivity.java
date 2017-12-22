@@ -52,6 +52,12 @@ public class MainActivity extends AppCompatActivity {
     private boolean addLawyer = false;
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+
+        /**
+         * Receive data from other activities
+         * @param context the context of the activity
+         * @param intent the intent with the parameters
+         */
         @Override
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
@@ -171,6 +177,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Test permissions
+     * @param requestCode the code to test
+     * @param permissions permissions granted
+     * @param grantResults results
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -201,11 +213,17 @@ public class MainActivity extends AppCompatActivity {
         outState.putFloat("longitude", longitude);
     }
 
+    /**
+     * Start the localisation service
+     */
     private void launchLocalisationService() {
         Intent intent = new Intent(this, GPSService.class);
         startService(intent);
     }
 
+    /**
+     * Update the Json stored in the internal memory
+     */
     private void updateJson() {
         // Instantiate the ProgressBar
         ProgressDialog mProgressDialog;
@@ -235,6 +253,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Reload the WebView
+     */
     private void loadFile() {
         // First we search if there is a known position for the user
         getPrefs();
@@ -292,6 +313,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Know if we show or hide a layer
+     * @param item      The checkbox item
+     * @param layerName the layer to show or hide
+     */
     private void dispLayer(MenuItem item, String layerName) {
         if (item.isChecked()) {
             webView.loadUrl("javascript:dispLayer('" + layerName + "', " + false + ")");
@@ -302,6 +328,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Manage the toolbar with the different buttons
+     */
     private void manageToolbar() {
         android.support.v7.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -320,10 +349,19 @@ public class MainActivity extends AppCompatActivity {
         buttonCenter.setOnClickListener(l -> centerMap());
     }
 
+    /**
+     * Center the map on the user location
+     */
     private void centerMap() {
         webView.loadUrl("javascript:centerMap()");
     }
 
+    /**
+     * Load the server properties, like IP address or open port
+     * @param key           The key to search
+     * @return              The asked value
+     * @throws IOException
+     */
     private String getServerProperties(String key) throws IOException {
         Properties properties = new Properties();
         AssetManager assetManager = getAssets();
@@ -332,6 +370,9 @@ public class MainActivity extends AppCompatActivity {
         return properties.getProperty(key);
     }
 
+    /**
+     * Update the latitude and longitude from the SharedPreferences
+     */
     private void getPrefs() {
         SharedPreferences userPrefs = getSharedPreferences("coordinates", MODE_PRIVATE);
         // If there is no known position, we center the map on Paris
@@ -339,10 +380,16 @@ public class MainActivity extends AppCompatActivity {
         longitude = userPrefs.getFloat("lastKnownLongitude", DEFAULT_LONGITUDE);
     }
 
+    /**
+     * Erase the itinerary on the map
+     */
     private void clearItinerary() {
         webView.loadUrl("javascript:clearItinerary()");
     }
 
+    /**
+     * Add a lawyer location on the map and on the PostGis database
+     */
     private void addLawyer() {
         Button button = findViewById(R.id.buttonAddLawyer);
         if (!addLawyer) {
@@ -356,8 +403,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-
+    /**
+     * Check if Internet connection is enabled or not
+     * @return  true if there is an Internet connection, false otherwise
+     */
     private boolean checkConnection(){
         boolean wifi = false;
         boolean mobile = false;

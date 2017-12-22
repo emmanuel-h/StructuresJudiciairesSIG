@@ -27,6 +27,11 @@ public class DownloadFile extends AsyncTask<String, Integer, String> {
         this.mProgressDialog = _mProgressDialog;
     }
 
+    /**
+     * Download json files from the server to the application
+     * @param urlsAndOutputsfiles   Files to read and write
+     * @return  a message if the download is complete, null otherwise
+     */
     @Override
     protected String doInBackground(String... urlsAndOutputsfiles) {
         InputStream input = null;
@@ -90,6 +95,9 @@ public class DownloadFile extends AsyncTask<String, Integer, String> {
         return null;
     }
 
+    /**
+     * Take the CPU lock and show the ProgressDialog
+     */
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
@@ -103,6 +111,10 @@ public class DownloadFile extends AsyncTask<String, Integer, String> {
         mProgressDialog.show();
     }
 
+    /**
+     * Update the progress dialog
+     * @param progress  the progression
+     */
     @Override
     protected void onProgressUpdate(Integer... progress) {
         super.onProgressUpdate(progress);
@@ -111,6 +123,10 @@ public class DownloadFile extends AsyncTask<String, Integer, String> {
         mProgressDialog.setProgress(progress[0]);
     }
 
+    /**
+     * Unlock the CPU, dismiss the ProgressDialog and warn the MainActivity download is done
+     * @param result
+     */
     @Override
     protected void onPostExecute(String result) {
         // Release the CPU lock
@@ -127,6 +143,10 @@ public class DownloadFile extends AsyncTask<String, Integer, String> {
         }
     }
 
+    /**
+     * Alert the Main Activity download ends
+     * @param value If download was complete or not
+     */
     private void alertEndDownload(boolean value){
         Intent intent = new Intent("download");
         intent.putExtra("status",value);
