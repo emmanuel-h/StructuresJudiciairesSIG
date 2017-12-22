@@ -21,7 +21,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import com.sig.galherret.structuresjudiciairessig.R;
 import com.sig.galherret.structuresjudiciairessig.model.GPSService;
@@ -29,14 +28,12 @@ import com.sig.galherret.structuresjudiciairessig.model.JavascriptConnection;
 
 import org.apache.commons.io.IOUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Properties;
 import java.util.logging.Logger;
+
 
 import static android.content.pm.PackageManager.PERMISSION_DENIED;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
@@ -269,6 +266,7 @@ public class MainActivity extends AppCompatActivity {
                 dispLayer(item, "vectorLayerLieuxJustice");
                 return true;
             case R.id.personnes:
+                dispLayer(item,"vectorLayerPersonne");
                 return true;
             case R.id.clearItinerary:
                 clearItinerary();

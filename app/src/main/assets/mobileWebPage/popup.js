@@ -63,6 +63,8 @@ map.on('click', function(event){
                 case pathToInternalStorage+"/liste_des_greffes.json":
                     listeGreffes(properties, coord);
                     break;
+                case pathToInternalStorage+"/personne.json":
+                    personne(properties, coord);
                 default:
                     content.innerHTML = '<h3>Could not retrieve data for this point</h3>';
                     break;
@@ -74,6 +76,29 @@ map.on('click', function(event){
                 map.removeLayer(vectorLine);
             }
     }
+
+    function personne(properties, coord){
+            content.innerHTML = '<h3>' + properties.PROFESSION + '</h3>' +
+                                '<p>' +
+                                    properties.NOM + '<br>' +
+                                    properties.PRENOM + '<br>' +
+                                    properties.ADRESSE + '<br>' +
+                                    properties.TELEPHONE
+                                '</p>';
+            buttons.innerHTML = '<button type="button" id="buttonCall">Call</button>' +
+                                '<button type="button" id="buttonDistance">Distance</button>' +
+                                '<button type="button" id="buttonItinerary">Itinerary</button>';
+            document.getElementById('buttonCall').onclick = function(){
+                JSInterface.makeCall(properties.TELEPHONE);
+            }
+            document.getElementById('buttonDistance').onclick = function(){
+                //JSInterface.calcDistance(+properties.LONGITUDE, +properties.LATITUDE);
+                calcDistance(+properties.LONGITUDE, +properties.LATITUDE);
+            }
+            document.getElementById('buttonItinerary').onclick = function(){
+                calcItinerary(+properties.LONGITUDE, +properties.LATITUDE);
+            }
+        }
 
     function annuaire(properties, coord){
         content.innerHTML = '<h3>' + properties.INTITULE + '</h3>' +
@@ -96,7 +121,7 @@ map.on('click', function(event){
             details.innerHTML = 'show details';
         }
         document.getElementById('buttonCall').onclick = function(){
-            JSInterface.makeCall('0624766258');
+            JSInterface.makeCall(properties.TELEPHONE);
         }
         document.getElementById('buttonDistance').onclick = function(){
             //JSInterface.calcDistance(+properties.LONGITUDE, +properties.LATITUDE);
@@ -127,7 +152,7 @@ map.on('click', function(event){
             details.innerHTML = 'view details';
         }
         document.getElementById('buttonCall').onclick = function(){
-            JSInterface.makeCall('0624766258');
+            JSInterface.makeCall(properties.TELEPHONE);
         }
         document.getElementById('buttonDistance').onclick = function(){
             calcDistance(+properties.LONGITUDE, +properties.LATITUDE);

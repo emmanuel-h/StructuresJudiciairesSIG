@@ -5,6 +5,7 @@ var vectorLayerTi;
 var vectorLayerTgi;
 var vectorLayerListeGreffes;
 var vectorLayerLieuxJustice;
+var vectorLayerPersonne;
 
 var pathToInternalStorage;
 
@@ -35,6 +36,8 @@ function dispLayer(layer, display){
         case "vectorLayerLieuxJustice":
             vectorLayerLieuxJustice.setVisible(display);
             break;
+        case "vectorLayerPersonne":
+            vectorLayerPersonne.setVisible(display);
         default:
             break;
     }
@@ -46,7 +49,7 @@ function afficherMap(longitude, latitude, path_to_internal_storage){
   vectorLayerTgi = createLayer(path_to_internal_storage+'/annuaire_tgi.json','#00ff00',4,0.1,5000);
   vectorLayerListeGreffes = createLayer(path_to_internal_storage+'/liste_des_greffes.json','#0000ff',2,0.1,3000);
   vectorLayerLieuxJustice = createLayer(path_to_internal_storage+'/annuaire_lieux_justice.json','#ffff00',1,0.1,500);
-
+  vectorLayerPersonne = createLayer(path_to_internal_storage+'/personne.json','#00ffff',1,0.1,500);
   pathToInternalStorage = path_to_internal_storage;
 
 //création de la map avec OSM et les differents layers
@@ -56,7 +59,7 @@ function afficherMap(longitude, latitude, path_to_internal_storage){
           source: new ol.source.OSM(),
           strategy: ol.loadingstrategy.bbox
         }),
-        vectorLayerTi, vectorLayerLieuxJustice, vectorLayerListeGreffes, vectorLayerTgi
+        vectorLayerTi, vectorLayerLieuxJustice, vectorLayerListeGreffes, vectorLayerTgi, vectorLayerPersonne
       ],
       target: 'map',
       view: new ol.View({
@@ -76,6 +79,7 @@ function changeStyle(){
   newZoom > 12 ? vectorLayerTi.setStyle(styleFunction("#ff0000",8)) : vectorLayerTi.setStyle(styleFunction('#ff0000',5)) ;
   newZoom > 10 ? vectorLayerListeGreffes.setStyle(styleFunction("#0000ff",12)) : vectorLayerListeGreffes.setStyle(styleFunction('#0000ff',5)) ;
   newZoom > 12 ? vectorLayerLieuxJustice.setStyle(styleFunction("#ffff00",8)) : vectorLayerLieuxJustice.setStyle(styleFunction('#ffff00',5)) ;
+   newZoom > 12 ? vectorLayerPersonne.setStyle(styleFunction("#00ffff",8)) : vectorLayerPersonne.setStyle(styleFunction('#00ffff',5)) ;
 };
 
 //fonction pour recuperer un style de point avec une couleur et un rayon
