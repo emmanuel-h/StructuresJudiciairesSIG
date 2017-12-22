@@ -41,10 +41,10 @@ function dispLayer(layer, display){
 }
 
 function afficherMap(longitude, latitude, path_to_internal_storage){
-  pathToInternalStorage = 'http://172.20.10.4:8080/structuresJudiciaires';
+  //pathToInternalStorage = 'http://172.20.10.4:8080/structuresJudiciaires';
   vectorLayerTi = createLayer(path_to_internal_storage+'/annuaire_ti.json','#ff0000',3,0.1,2500);
   vectorLayerTgi = createLayer(path_to_internal_storage+'/annuaire_tgi.json','#00ff00',4,0.1,5000);
-  vectorLayerListeGreffes = createLayer(path_to_internal_storage+'/liste-des-greffes.json','#0000ff',2,0.1,3000);
+  vectorLayerListeGreffes = createLayer(path_to_internal_storage+'/liste_des_greffes.json','#0000ff',2,0.1,3000);
   vectorLayerLieuxJustice = createLayer(path_to_internal_storage+'/annuaire_lieux_justice.json','#ffff00',1,0.1,500);
 
   pathToInternalStorage = path_to_internal_storage;

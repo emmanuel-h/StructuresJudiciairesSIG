@@ -1,8 +1,10 @@
 package com.sig.galherret.structuresjudiciairessig.view;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Environment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -17,14 +19,17 @@ import android.widget.Toast;
 import com.sig.galherret.structuresjudiciairessig.R;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 public class AddLawyerActivity extends AppCompatActivity {
 
@@ -39,58 +44,38 @@ public class AddLawyerActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 
-        Button buttonAdd = findViewById(R.id.buttonAddLawyer);
-        buttonAdd.setOnClickListener(l -> addLawyer());
+        Button buttonAdd = findViewById(R.id.buttonAdd);
+        buttonAdd.setOnClickListener(l -> sendData());
     }
 
-    private void addLawyer(){
-
-    }
-
-    private void createFile(){
+    private void sendData(){
         double longitude = getIntent().getDoubleExtra("longitude", 0);
         double latitude = getIntent().getDoubleExtra("latitude", 0);
         EditText nameText = findViewById(R.id.name);
         String name = nameText.getText().toString();
+        name = name.replaceAll("&", "");
         EditText forenameText = findViewById(R.id.forename);
         String forename = forenameText.getText().toString();
+        forename = forename.replaceAll("&", "");
         EditText addressText = findViewById(R.id.address);
         String address = addressText.getText().toString();
+        address = address.replaceAll("&", "");
         EditText phoneText = findViewById(R.id.phoneNumber);
         String phoneNumber = phoneText.getText().toString();
+        phoneNumber = phoneNumber.replaceAll("&", "");
         Spinner spinner = findViewById(R.id.profession);
         String profession = spinner.getSelectedItem().toString();
-        try {
-            FileOutputStream fos = openFileOutput("newLawyer", Context.MODE_APPEND);
-            OutputStreamWriter osw = new OutputStreamWriter(fos);
-            osw.write("name:" + name + ","
-                    + "forename:" + forename + ","
-                    + "address:" + address + ","
-                    + "phone:" + phoneNumber + ","
-                    + "profession:" + profession);
-            osw.close();
-            fos.close();
-        } catch (IOException e) {
-            Toast.makeText(this, "Cannot add a lawyer", Toast.LENGTH_LONG).show();
-        }
-    }
 
-    private void sendFile() throws IOException {
-        String serverAddress = "http://" + getServerProperties("IPAddress") + ":8080";
-        File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "newLawyer");
-        URL url = new URL(serverAddress);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setConnectTimeout(2000);
-        connection.setRequestMethod("GET");
-        connection.setDoOutput(true);
-        connection.connect();
-    }
+        Intent intent = new Intent("sendData");
+        intent.putExtra("name", name);
+        intent.putExtra("forename", forename);
+        intent.putExtra("address", address);
+        intent.putExtra("phoneNumber", phoneNumber);
+        intent.putExtra("profession", profession);
+        intent.putExtra("longitude", longitude);
+        intent.putExtra("latitude", latitude);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
-    private String getServerProperties(String key) throws IOException {
-        Properties properties = new Properties();
-        AssetManager assetManager = getAssets();
-        InputStream inputStream = assetManager.open("server.properties");
-        properties.load(inputStream);
-        return properties.getProperty(key);
+        super.finish();
     }
 }

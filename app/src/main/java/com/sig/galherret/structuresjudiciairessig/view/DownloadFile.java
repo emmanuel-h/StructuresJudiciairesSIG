@@ -133,6 +133,5 @@ public class DownloadFile extends AsyncTask<String, Integer, String> {
         Intent intent = new Intent("download");
         intent.putExtra("status",value);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-
     }
 }

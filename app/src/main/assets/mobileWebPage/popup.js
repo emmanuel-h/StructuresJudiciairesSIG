@@ -13,6 +13,20 @@ function setPathToInternalStorage(path){
 
 function setAddLawyer(value){
     addLawyer = value;
+    if(!addLawyer){
+        overlay.setPosition(undefined);
+        closer.blur();
+    }
+}
+
+function sendDataToServer(serverAddress, serverPort, longitude, latitude, name, forename, address, phone, profession){
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "http://" + serverAddress + ":" + serverPort, true);
+    xhttp.send("&longitude=" + longitude + "&latitude=" + latitude + "&nom=" + name
+            + "&prenom=" + forename + "&adresse=" + address + "&telephone=" + phone
+            + "&profession=" + profession);
+    overlay.setPosition(undefined);
+    closer.blur();
 }
 
 var overlay = new ol.Overlay({
@@ -48,6 +62,7 @@ map.on('click', function(event){
         buttons.innerHTML = '<button type="button" id="buttonAddLawyer">Add a lawyer</button>';
         document.getElementById('buttonAddLawyer').onclick = function(){
             JSInterface.addLawyer(+coordProj[0], +coordProj[1]);
+            //sendDataToServer();
         }
         overlay.setPosition(coordinate);
     }else{
@@ -60,7 +75,7 @@ map.on('click', function(event){
                 case pathToInternalStorage+"/annuaire_ti.json":
                     annuaire(properties, coord);
                     break;
-                case pathToInternalStorage+"/liste-des-greffes.json":
+                case pathToInternalStorage+"/liste_des_greffes.json":
                     listeGreffes(properties, coord);
                     break;
                 default:
@@ -185,7 +200,7 @@ map.on('click', function(event){
                 geometry:new ol.geom.LineString(coordProj)
             });
             var sourceVector = new ol.source.Vector({
-                        features:[featureLine]
+                features:[featureLine]
             });
             itineraryLine = new ol.layer.Vector({
                 source:sourceVector,
