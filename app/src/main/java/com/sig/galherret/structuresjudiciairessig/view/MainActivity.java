@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -58,25 +60,22 @@ public class MainActivity extends AppCompatActivity {
                     if (status) {
                         Toast.makeText(MainActivity.this, "Update complete", Toast.LENGTH_LONG).show();
                     } else {
-                        Toast.makeText(MainActivity.this, "Update did not work", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, "Update did not work. You should check your connectivity", Toast.LENGTH_LONG).show();
                     }
                     loadFile();
                     break;
-                case "upload":
-                    if(status){
-                        Toast.makeText(MainActivity.this, "Upload complete", Toast.LENGTH_LONG).show();
-                    }else{
-                        Toast.makeText(MainActivity.this, "Upload failed", Toast.LENGTH_LONG).show();
-                    }
-                    break;
                 case "loadWebsite":
-                    String url = intent.getStringExtra("url");
-                    if (null == url) {
-                        Toast.makeText(MainActivity.this, "Could not load this website", Toast.LENGTH_LONG).show();
-                    } else {
-                        Intent mIntent = new Intent(MainActivity.this, WebViewActivity.class);
-                        mIntent.putExtra("url", url);
-                        startActivity(mIntent);
+                    if(checkConnection()) {
+                        String url = intent.getStringExtra("url");
+                        if (null == url) {
+                            Toast.makeText(MainActivity.this, "Could not load this website", Toast.LENGTH_LONG).show();
+                        } else {
+                            Intent mIntent = new Intent(MainActivity.this, WebViewActivity.class);
+                            mIntent.putExtra("url", url);
+                            startActivity(mIntent);
+                        }
+                    }else{
+                        Toast.makeText(MainActivity.this, "You must enable internet access for this", Toast.LENGTH_LONG).show();
                     }
                     break;
                 case "makeCall":
@@ -95,29 +94,38 @@ public class MainActivity extends AppCompatActivity {
                     webView.loadUrl("javascript:updateLocation(" + longitude + ", " + latitude + ")");
                     break;
                 case "addLawyer":
-                    double longitudeLawyer = intent.getDoubleExtra("longitude", 0);
-                    double latitudeLawyer = intent.getDoubleExtra("latitude", 0);
-                    Intent mIntent = new Intent(MainActivity.this, AddLawyerActivity.class);
-                    mIntent.putExtra("longitude", longitudeLawyer);
-                    mIntent.putExtra("latitude", latitudeLawyer);
-                    startActivity(mIntent);
+                    if(checkConnection()) {
+                        double longitudeLawyer = intent.getDoubleExtra("longitude", 0);
+                        double latitudeLawyer = intent.getDoubleExtra("latitude", 0);
+                        Intent mIntent = new Intent(MainActivity.this, AddLawyerActivity.class);
+                        mIntent.putExtra("longitude", longitudeLawyer);
+                        mIntent.putExtra("latitude", latitudeLawyer);
+                        startActivity(mIntent);
+                    }else{
+                        Toast.makeText(MainActivity.this, "You must enable internet access for this", Toast.LENGTH_LONG).show();
+                    }
                     break;
                 case "sendData":
-                    String name = intent.getStringExtra("name");
-                    String forename = intent.getStringExtra("forename");
-                    String address = intent.getStringExtra("address");
-                    String phoneNumber2 = intent.getStringExtra("phoneNumber");
-                    String profession = intent.getStringExtra("profession");
-                    double longitudeLawyer2 = intent.getDoubleExtra("longitude", 0);
-                    double latitudeLawyer2 = intent.getDoubleExtra("latitude", 0);
-                    try {
-                        webView.loadUrl("javascript:sendDataToServer('" + getServerProperties("IPAddress") + "','"
-                                + getServerProperties("PortAddress") + "'," + longitudeLawyer2 + "," + latitudeLawyer2
-                                + ",'" + name + "','" + forename + "','" + address
-                                + "','" + phoneNumber2 + "','" + profession + "')");
-                        addLawyer();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    if(checkConnection()) {
+                        String name = intent.getStringExtra("name");
+                        String forename = intent.getStringExtra("forename");
+                        String address = intent.getStringExtra("address");
+                        String phoneNumber2 = intent.getStringExtra("phoneNumber");
+                        String profession = intent.getStringExtra("profession");
+                        double longitudeLawyer2 = intent.getDoubleExtra("longitude", 0);
+                        double latitudeLawyer2 = intent.getDoubleExtra("latitude", 0);
+                        try {
+                            webView.loadUrl("javascript:sendDataToServer('" + getServerProperties("IPAddress") + "','"
+                                    + getServerProperties("PortAddress") + "'," + longitudeLawyer2 + "," + latitudeLawyer2
+                                    + ",'" + name + "','" + forename + "','" + address
+                                    + "','" + phoneNumber2 + "','" + profession + "')");
+                            addLawyer();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        Toast.makeText(MainActivity.this, "Lawyer add submited to the server", Toast.LENGTH_LONG).show();
+                    }else{
+                        Toast.makeText(MainActivity.this, "You must enable internet access for this", Toast.LENGTH_LONG).show();
                     }
                     break;
                 default:
@@ -149,8 +157,6 @@ public class MainActivity extends AppCompatActivity {
             LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                     new IntentFilter("download"));
             LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
-                    new IntentFilter("upload"));
-            LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                     new IntentFilter("loadWebsite"));
             LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                     new IntentFilter("makeCall"));
@@ -167,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (grantResults[0] == PERMISSION_DENIED) {
-            Toast.makeText(getBaseContext(), "You doesn't allow the app to access the location, some services may not work properly", Toast.LENGTH_LONG).show();
+            Toast.makeText(getBaseContext(), "Location permission denied. Some services may not be available", Toast.LENGTH_LONG).show();
         }
         if (grantResults[0] == PERMISSION_GRANTED) {
             launchLocalisationService();
@@ -336,5 +342,31 @@ public class MainActivity extends AppCompatActivity {
             addLawyer = false;
             webView.loadUrl("javascript:setAddLawyer(" + false + ")");
         }
+    }
+
+
+
+    private boolean checkConnection(){
+        boolean wifi = false;
+        boolean mobile = false;
+
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (null != cm) {
+            NetworkInfo[] netInfo = cm.getAllNetworkInfo();
+            for(NetworkInfo info : netInfo){
+                if(info.getTypeName().equalsIgnoreCase("WIFI")){
+                    if(info.isConnectedOrConnecting()){
+                        wifi = true;
+                    }
+                }else{
+                    if(info.getTypeName().equalsIgnoreCase("MOBILE")){
+                        if(info.isConnectedOrConnecting()){
+                            mobile = true;
+                        }
+                    }
+                }
+            }
+        }
+        return wifi || mobile;
     }
 }

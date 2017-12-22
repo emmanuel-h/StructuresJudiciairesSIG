@@ -14,7 +14,7 @@ function updateLocation(long, lat){
 }
 
 function centerMap(){
-   map.getView().setCenter(ol.proj.transform([longitude, latitude], 'EPSG:4326', 'EPSG:3857'));
+   map.getView().setCenter(ol.proj.transform([+longitude, +latitude], 'EPSG:4326', 'EPSG:3857'));
 }
 
 function clearItinerary(){
