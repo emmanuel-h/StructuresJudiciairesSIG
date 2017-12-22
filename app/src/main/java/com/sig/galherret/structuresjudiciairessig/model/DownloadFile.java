@@ -1,4 +1,4 @@
-package com.sig.galherret.structuresjudiciairessig.view;
+package com.sig.galherret.structuresjudiciairessig.model;
 
 import android.app.ProgressDialog;
 import android.content.Context;

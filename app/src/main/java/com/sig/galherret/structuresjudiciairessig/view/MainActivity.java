@@ -25,6 +25,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.sig.galherret.structuresjudiciairessig.R;
+import com.sig.galherret.structuresjudiciairessig.model.DownloadFile;
 import com.sig.galherret.structuresjudiciairessig.model.GPSService;
 import com.sig.galherret.structuresjudiciairessig.model.JavascriptConnection;
 
