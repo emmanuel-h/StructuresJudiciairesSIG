@@ -15,9 +15,11 @@ function setPathToInternalStorage(path){
 // Change the value of addLawyer : true if the user wants to add one, false otherwise
 function setAddLawyer(value){
     addLawyer = value;
-    if(!addLawyer){
-        overlay.setPosition(undefined);
-        closer.blur();
+    overlay.setPosition(undefined);
+    closer.blur();
+    details.innerHTML = "";
+    if(addLawyer){
+        map.removeLayer(vectorLine);
     }
 }
 // Send datas from AddLawyerActivity to a python server with AJAX
@@ -63,7 +65,7 @@ map.on('click', function(event){
     var feature = map.forEachFeatureAtPixel(event.pixel, function(feature, layer){
         layerUrl = layer.getSource().getUrl();
         return feature;
-    }, {hitTolerance:10});
+    }, {hitTolerance:5});
     // If the user clicks on the map and has clicked on the 'add lawyer' button
     if(addLawyer){
         coordProj = ol.proj.transform(coordinate, 'EPSG:3857', 'EPSG:4326');
@@ -81,6 +83,8 @@ map.on('click', function(event){
     }else{
         // If there is any feature where the user clicked, e.g. if he clicked on a point
         if(feature){
+            map.removeLayer(vectorLine);
+            details.innerHTML = "";
             // We get the properties of the point
             var properties = feature.getProperties();
             var coord = feature.getGeometry().getCoordinates();
@@ -212,7 +216,7 @@ map.on('click', function(event){
         var long2 = destLongitude * Math.PI / 180;
         var rayon = 6371;
         var distance = rayon * Math.acos(Math.cos(lat1) * Math.cos(lat2) * Math.cos(long2 - long1) + Math.sin(lat1) * Math.sin(lat2));
-        details.innerHTML += '<p>Distance to the point : ' + distance.toFixed(2) + ' Km</p>';
+        details.innerHTML = '<p>Distance to the point : ' + distance.toFixed(2) + ' Km</p>';
 
         var userPos = ol.proj.transform([+longitude,+latitude], 'EPSG:4326','EPSG:3857');
         var destPos = ol.proj.transform([+destLongitude,+destLatitude], 'EPSG:4326','EPSG:3857')
