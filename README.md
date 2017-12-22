@@ -1,6 +1,6 @@
 # StructuresJudiciairesSIG
 
-<h2>To deploy the server</h2>
+<h2>Installation and configuration</h2>
 <ul>
 <li>
 1. Create a directory to put the script coolScript and the FWTools installation from 2.a. It will also serve to store temporary files.
@@ -23,6 +23,10 @@
 		&emsp;cd mapshaper<br>
 		&emsp;npm install
 	</li>
+	<li>
+	c. Install psycopg2 for the communication between python server and postgis database, for example with pip :<br>
+		&emsp;sudo pip install psycopg2
+	</li>
 	</ul>
 </li>
 <li>
@@ -37,3 +41,5 @@
 	</ul>
 </li>
 </ul>
+<h2>Servers setup</h2>
+To launch the tomcat and refresh the json with
