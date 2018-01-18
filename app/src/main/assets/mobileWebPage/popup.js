@@ -65,7 +65,7 @@ map.on('click', function(event){
     var feature = map.forEachFeatureAtPixel(event.pixel, function(feature, layer){
         layerUrl = layer.getSource().getUrl();
         return feature;
-    }, {hitTolerance:5});
+    }, {hitTolerance:10});
     // If the user clicks on the map and has clicked on the 'add lawyer' button
     if(addLawyer){
         coordProj = ol.proj.transform(coordinate, 'EPSG:3857', 'EPSG:4326');
